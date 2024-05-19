@@ -1,4 +1,5 @@
 using PuzzleGame.Controllers;
+using PuzzleGame.Models;
 using PuzzleGame.Utilities;
 
 namespace PuzzleGame.Views;
@@ -71,7 +72,8 @@ public class MainForm : Form, IBoardView, IWinObserver
         using var dialog = new StartGameDialog();
         if (dialog.ShowDialog() != DialogResult.OK) return;
         var size = dialog.BoardSize;
-        var newController = BoardFactory.CreateBoardController(this, size);
+        var shuffleStrategy = new RandomShuffleStrategy();
+        var newController = BoardFactory.CreateBoardController(this, size, shuffleStrategy);
         SetController(newController);
         Show();
     }
@@ -84,6 +86,8 @@ public class MainForm : Form, IBoardView, IWinObserver
         Name = "MainForm";
         Text = "Sliding Puzzle Game";
         DoubleBuffered = true;
+        MaximizeBox = false;
+        StartPosition = FormStartPosition.CenterScreen;
         ResumeLayout(false);
     }
 }

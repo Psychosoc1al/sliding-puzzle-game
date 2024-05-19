@@ -10,6 +10,6 @@ internal static class Program
         Application.EnableVisualStyles();
         Application.SetCompatibleTextRenderingDefault(false);
 
-        GameManager.StartGame();
+        GameManager.GameInstance.StartGame();
     }
 }

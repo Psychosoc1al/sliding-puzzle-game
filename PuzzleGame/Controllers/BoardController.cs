@@ -5,17 +5,27 @@ namespace PuzzleGame.Controllers;
 
 public class BoardController
 {
-    public BoardController(IBoardView view, int size)
+    public Board Board { get; }
+    private readonly Stack<ICommand> _commands = new();
+
+    public BoardController(IBoardView view, Board board)
     {
-        Board = new Board(size);
+        Board = board;
         Board.RegisterObserver(view);
         view.SetController(this);
     }
 
-    public Board Board { get; }
-
     public void MoveTile(int row, int col)
     {
-        Board.MoveTile(row, col);
+        var command = new MoveTileCommand(Board, row, col);
+        command.Execute();
+        _commands.Push(command);
+    }
+
+    public void UndoMove()
+    {
+        if (_commands.Count <= 0) return;
+        var command = _commands.Pop();
+        command.Undo();
     }
 }

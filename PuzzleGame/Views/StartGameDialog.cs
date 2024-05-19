@@ -51,11 +51,12 @@ namespace PuzzleGame.Views
 
             // Disable the fullscreen button
             MaximizeBox = false;
+            StartPosition = FormStartPosition.CenterScreen;
         }
 
         private void startButton_Click(object? sender, EventArgs e)
         {
-            var selectedSize = _boardSizeComboBox?.SelectedItem?.ToString();
+            var selectedSize = _boardSizeComboBox.SelectedItem?.ToString();
             BoardSize = selectedSize switch
             {
                 "3x3" => 3,

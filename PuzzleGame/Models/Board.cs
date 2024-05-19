@@ -5,21 +5,37 @@ namespace PuzzleGame.Models;
 public class Board : IObservable
 {
     private readonly List<IObserver> _observers;
-    private readonly Random _random = new();
     private readonly List<IWinObserver> _winObservers;
+    private readonly IShuffleStrategy _shuffleStrategy;
 
-    public Board(int size)
+    public int Size { get; }
+
+    public Tile[,] Tiles { get; }
+
+    public Board(int size, IShuffleStrategy shuffleStrategy)
     {
         Size = size;
         Tiles = new Tile[size, size];
         _observers = new List<IObserver>();
         _winObservers = new List<IWinObserver>();
+        _shuffleStrategy = shuffleStrategy;
         InitializeBoard();
     }
 
-    public int Size { get; }
+    private void InitializeBoard()
+    {
+        var number = 1;
+        for (var i = 0; i < Size; i++)
+        {
+            for (var j = 0; j < Size; j++)
+            {
+                Tiles[i, j] = new Tile(number % (Size * Size));
+                number++;
+            }
+        }
 
-    public Tile[,] Tiles { get; }
+        _shuffleStrategy.Shuffle(Tiles, Size);
+    }
 
 
     public void RegisterObserver(IObserver observer)
@@ -37,48 +53,6 @@ public class Board : IObservable
     {
         foreach (var observer in _observers) observer.Update();
     }
-
-    private void InitializeBoard()
-    {
-        var number = 1;
-        for (var i = 0; i < Size; i++)
-        {
-            for (var j = 0; j < Size; j++)
-            {
-                Tiles[i, j] = new Tile(number % (Size * Size));
-                number++;
-            }
-        }
-
-        Shuffle();
-    }
-
-    private void Shuffle()
-    {
-        var swapCount = _random.Next(10, 51) * 2;
-        for (var i = 0; i < swapCount; i++)
-        {
-            var swap1 = GetRandomConsecutiveTiles();
-            var swap2 = GetNextConsecutiveTile(swap1[0], swap1[1]);
-            Swap(swap1[0], swap1[1], swap2[0], swap2[1]);
-        }
-    }
-
-    private int[] GetRandomConsecutiveTiles()
-    {
-        var index = _random.Next(Size * Size - 2);
-        var row = index / Size;
-        var col = index % Size;
-        return [row, col];
-    }
-
-    private int[] GetNextConsecutiveTile(int row, int col)
-    {
-        if (col < Size - 1) return [row, col + 1];
-
-        return row < Size - 1 ? [row + 1, 0] : [row, col];
-    }
-
 
     private void Swap(int i1, int j1, int i2, int j2)
     {
