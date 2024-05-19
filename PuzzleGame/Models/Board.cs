@@ -24,6 +24,7 @@ public class Board : IObservable
 
     public void RegisterObserver(IObserver observer)
     {
+        _observers.Clear();
         _observers.Add(observer);
     }
 
@@ -85,20 +86,14 @@ public class Board : IObservable
     }
 
 
-    public bool MoveTile(int row, int col)
+    public void MoveTile(int row, int col)
     {
-        if (Tiles[row, col].IsEmpty) return false;
+        if (Tiles[row, col].IsEmpty) return;
         var (emptyRow, emptyCol) = FindEmptyTile();
-        if (Math.Abs(emptyRow - row) + Math.Abs(emptyCol - col) != 1) return false;
+        if (Math.Abs(emptyRow - row) + Math.Abs(emptyCol - col) != 1) return;
         Swap(row, col, emptyRow, emptyCol);
         NotifyObservers();
-        if (CheckWin())
-        {
-            Console.WriteLine($"{row} {col}");
-            NotifyWinObservers();
-        }
-
-        return true;
+        if (CheckWin()) NotifyWinObservers();
     }
 
 
@@ -130,14 +125,9 @@ public class Board : IObservable
         return true;
     }
 
-    public void RemoveAllObservers()
-    {
-        _observers.Clear();
-        _winObservers.Clear();
-    }
-
     public void RegisterWinObserver(IWinObserver winObserver)
     {
+        _winObservers.Clear();
         _winObservers.Add(winObserver);
     }
 

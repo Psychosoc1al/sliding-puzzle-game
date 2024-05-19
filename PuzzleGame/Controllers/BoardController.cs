@@ -18,9 +18,4 @@ public class BoardController
     {
         Board.MoveTile(row, col);
     }
-
-    public void Unsubscribe()
-    {
-        Board.RemoveAllObservers();
-    }
 }
