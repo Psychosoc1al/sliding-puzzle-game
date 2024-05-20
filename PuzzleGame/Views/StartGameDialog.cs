@@ -2,6 +2,9 @@ namespace PuzzleGame.Views
 {
     public class StartGameDialog : Form
     {
+        private readonly ComboBox _boardSizeComboBox;
+        private readonly Button _startButton;
+        private readonly FlowLayoutPanel _flowLayoutPanel;
         public int BoardSize { get; private set; }
 
         public StartGameDialog()
@@ -61,15 +64,10 @@ namespace PuzzleGame.Views
             {
                 "3x3" => 3,
                 "4x4" => 4,
-                "5x5" => 5,
-                _ => BoardSize
+                _ => 5
             };
             DialogResult = DialogResult.OK;
             Close();
         }
-
-        private readonly ComboBox _boardSizeComboBox;
-        private readonly Button _startButton;
-        private readonly FlowLayoutPanel _flowLayoutPanel;
     }
 }

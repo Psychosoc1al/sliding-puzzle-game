@@ -1,5 +1,4 @@
 using PuzzleGame.Controllers;
-using PuzzleGame.Models;
 using PuzzleGame.Utilities;
 
 namespace PuzzleGame.Views;
@@ -36,11 +35,16 @@ public class MainForm : Form, IBoardView, IWinObserver
                     Height = tileSize,
                     Left = j * tileSize,
                     Top = i * tileSize,
-                    Text = _controller.Board.Tiles[i, j].Number.ToString()
+                    Text = _controller.Board.Tiles[i, j].Number.ToString(),
+                    BackColor = Color.FromArgb(CountTileAlpha(i, j), _controller.TileColor),
+                    ForeColor = Color.FromArgb(255, 67, 67, 67),
+                    Font = new Font("Microsoft Sans Serif", (int)(60.0 / _controller.Board.Size)),
                 };
                 if (_controller.Board.Tiles[i, j].IsEmpty)
                 {
                     tileButton.Text = "";
+                    tileButton.BackColor = Color.White;
+                    tileButton.Enabled = false;
                 }
                 else
                 {
@@ -52,6 +56,16 @@ public class MainForm : Form, IBoardView, IWinObserver
                 Controls.Add(tileButton);
             }
         }
+    }
+
+    private int CountTileAlpha(int row, int col)
+    {
+        if (_controller == null) return 0;
+        const int offset = 20;
+        const double multiplier = 150;
+        var size = _controller.Board.Size;
+
+        return (int)(_controller.Board.Tiles[row, col].Number * multiplier / (size * size) + offset);
     }
 
     public new void Update()

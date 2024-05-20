@@ -6,11 +6,18 @@ namespace PuzzleGame.Controllers;
 public class BoardController
 {
     public Board Board { get; }
+    public Color TileColor { get; }
     private readonly Stack<ICommand> _commands = new();
 
     public BoardController(IBoardView view, Board board)
     {
         Board = board;
+        TileColor = board.Size switch
+        {
+            3 => Color.SpringGreen,
+            4 => Color.DarkOrange,
+            _ => Color.Tomato,
+        };
         Board.RegisterObserver(view);
         view.SetController(this);
     }
