@@ -17,6 +17,8 @@ namespace PuzzleGame.Views
 
         private void InitializeComponent()
         {
+            Font = new Font("Microsoft Sans Serif", 12);
+
             // flowLayoutPanel
             _flowLayoutPanel.FlowDirection = FlowDirection.LeftToRight;
             _flowLayoutPanel.Dock = DockStyle.Fill;
@@ -30,7 +32,7 @@ namespace PuzzleGame.Views
             _boardSizeComboBox.Items.AddRange(new object[] { "3x3", "4x4", "5x5" });
             _boardSizeComboBox.SelectedIndex = 0; // Default to 3x3
             _boardSizeComboBox.Name = "_boardSizeComboBox";
-            _boardSizeComboBox.Margin = new Padding(20, 4, 75, 0); // Aligning
+            _boardSizeComboBox.Margin = new Padding(20, 4, 50, 0); // Aligning
             _boardSizeComboBox.AutoSize = true;
 
             // startButton

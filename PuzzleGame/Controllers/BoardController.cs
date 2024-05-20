@@ -1,5 +1,6 @@
 using PuzzleGame.Models;
 using PuzzleGame.Utilities;
+using PuzzleGame.Views;
 
 namespace PuzzleGame.Controllers;
 
@@ -9,7 +10,7 @@ public class BoardController
     public Color TileColor { get; }
     private readonly Stack<ICommand> _commands = new();
 
-    public BoardController(IBoardView view, Board board)
+    public BoardController(MainForm view, Board board)
     {
         Board = board;
         TileColor = board.Size switch

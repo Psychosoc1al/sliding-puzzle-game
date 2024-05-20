@@ -3,7 +3,7 @@ using PuzzleGame.Utilities;
 
 namespace PuzzleGame.Views;
 
-public class MainForm : Form, IBoardView, IWinObserver
+public class MainForm : Form, IObserver, IWinObserver
 {
     private BoardController? _controller;
 
