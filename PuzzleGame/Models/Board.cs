@@ -7,6 +7,7 @@ public class Board : IObservable
     private readonly List<IObserver> _observers;
     private readonly List<IWinObserver> _winObservers;
     private readonly IShuffleStrategy _shuffleStrategy;
+    public StatusEnum Status { get; set; }
 
     public int Size { get; }
 
@@ -40,7 +41,6 @@ public class Board : IObservable
 
     public void RegisterObserver(IObserver observer)
     {
-        _observers.Clear();
         _observers.Add(observer);
     }
 

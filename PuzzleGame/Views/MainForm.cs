@@ -36,17 +36,20 @@ public class MainForm : Form, IBoardView, IWinObserver
                     Height = tileSize,
                     Left = j * tileSize,
                     Top = i * tileSize,
-                    Text = _controller.Board.Tiles[i, j].Number.ToString()
+                    Text = _controller.Board.Tiles[i, j].Number.ToString(),
+                    Font = new Font("Microsoft Sans Serif", 20)
                 };
                 if (_controller.Board.Tiles[i, j].IsEmpty)
                 {
                     tileButton.Text = "";
+                    tileButton.BackColor = BackColor;
                 }
                 else
                 {
                     var row = i;
                     var col = j;
                     tileButton.Click += (_, _) => _controller.MoveTile(row, col);
+                    tileButton.BackColor = Color.White;
                 }
 
                 Controls.Add(tileButton);
@@ -61,7 +64,9 @@ public class MainForm : Form, IBoardView, IWinObserver
 
     public void OnWin()
     {
-        MessageBox.Show("Congratulations! You've solved the puzzle! Restarting the game.", "You Win!",
+        if (_controller == null) return;
+        int count = _controller.Counter.Count;
+        MessageBox.Show($"Congratulations! You've solved the puzzle!\nMoves: {count}\nRestarting the game.", "You Win!",
             MessageBoxButtons.OK, MessageBoxIcon.Information);
         RestartGame();
     }

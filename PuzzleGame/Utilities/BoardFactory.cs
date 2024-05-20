@@ -8,7 +8,8 @@ namespace PuzzleGame.Utilities
         public static BoardController CreateBoardController(IBoardView view, int size, IShuffleStrategy shuffleStrategy)
         {
             var board = new Board(size, shuffleStrategy);
-            return new BoardController(view, board);
+            var counter = new Counter(board);
+            return new BoardController(view, board, counter);
         }
     }
 }

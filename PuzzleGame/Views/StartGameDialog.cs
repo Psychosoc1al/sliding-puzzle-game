@@ -14,6 +14,7 @@ namespace PuzzleGame.Views
 
         private void InitializeComponent()
         {
+            Font = new Font("Microsoft Sans Serif", 12);
             // flowLayoutPanel
             _flowLayoutPanel.FlowDirection = FlowDirection.LeftToRight;
             _flowLayoutPanel.Dock = DockStyle.Fill;
