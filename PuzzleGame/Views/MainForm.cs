@@ -38,7 +38,7 @@ public class MainForm : Form, IObserver, IWinObserver
                     Text = _controller.Board.Tiles[i, j].Number.ToString(),
                     BackColor = Color.FromArgb(CountTileAlpha(i, j), _controller.TileColor),
                     ForeColor = Color.FromArgb(255, 67, 67, 67),
-                    Font = new Font("Microsoft Sans Serif", (int)(60.0 / _controller.Board.Size))
+                    Font = new Font("Comfortaa", (int)(60.0 / _controller.Board.Size), FontStyle.Bold)
                 };
                 if (_controller.Board.Tiles[i, j].IsEmpty)
                 {
