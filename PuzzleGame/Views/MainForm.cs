@@ -20,7 +20,7 @@ public class MainForm : Form, IObserver, IWinObserver
         UpdateView();
     }
 
-    public void UpdateView()
+    private void UpdateView()
     {
         Controls.Clear();
         if (_controller == null) return;
@@ -38,7 +38,7 @@ public class MainForm : Form, IObserver, IWinObserver
                     Text = _controller.Board.Tiles[i, j].Number.ToString(),
                     BackColor = Color.FromArgb(CountTileAlpha(i, j), _controller.TileColor),
                     ForeColor = Color.FromArgb(255, 67, 67, 67),
-                    Font = new Font("Microsoft Sans Serif", (int)(60.0 / _controller.Board.Size)),
+                    Font = new Font("Microsoft Sans Serif", (int)(60.0 / _controller.Board.Size))
                 };
                 if (_controller.Board.Tiles[i, j].IsEmpty)
                 {
@@ -86,8 +86,7 @@ public class MainForm : Form, IObserver, IWinObserver
         using var dialog = new StartGameDialog();
         if (dialog.ShowDialog() != DialogResult.OK) return;
         var size = dialog.BoardSize;
-        var shuffleStrategy = new RandomShuffleStrategy();
-        var newController = BoardFactory.CreateBoardController(this, size, shuffleStrategy);
+        var newController = BoardFactory.CreateBoardController(this, size);
         SetController(newController);
         Show();
     }

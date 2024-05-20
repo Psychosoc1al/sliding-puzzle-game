@@ -17,7 +17,7 @@ public class BoardController
         {
             3 => Color.SpringGreen,
             4 => Color.DarkOrange,
-            _ => Color.Tomato,
+            _ => Color.Tomato
         };
         Board.RegisterObserver(view);
         view.SetController(this);

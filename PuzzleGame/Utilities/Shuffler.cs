@@ -2,13 +2,13 @@ using PuzzleGame.Models;
 
 namespace PuzzleGame.Utilities;
 
-public class RandomShuffleStrategy : IShuffleStrategy
+public static class Shuffler
 {
-    private readonly Random _random = new();
+    private static readonly Random Random = new();
 
-    public void Shuffle(Tile[,] tiles, int size)
+    public static void Shuffle(Tile[,] tiles, int size)
     {
-        var swapCount = _random.Next((int)Math.Pow(size, 4), (int)Math.Pow(size, 5)) * 2;
+        var swapCount = Random.Next((int)Math.Pow(size, 4), (int)Math.Pow(size, 5)) * 2;
         for (var i = 0; i < swapCount; i++)
         {
             var swap1 = GetRandomConsecutiveTiles(size);
@@ -17,9 +17,14 @@ public class RandomShuffleStrategy : IShuffleStrategy
         }
     }
 
-    private int[] GetRandomConsecutiveTiles(int size)
+    public static void Swap(Tile[,] tiles, int i1, int j1, int i2, int j2)
     {
-        var index = _random.Next(size * size - 2);
+        (tiles[i1, j1], tiles[i2, j2]) = (tiles[i2, j2], tiles[i1, j1]);
+    }
+
+    private static int[] GetRandomConsecutiveTiles(int size)
+    {
+        var index = Random.Next(size * size - 2);
         var row = index / size;
         var col = index % size;
         return [row, col];
@@ -30,10 +35,5 @@ public class RandomShuffleStrategy : IShuffleStrategy
         if (col < size - 1) return [row, col + 1];
 
         return row < size - 1 ? [row + 1, 0] : [0, 0];
-    }
-
-    private static void Swap(Tile[,] tiles, int i1, int j1, int i2, int j2)
-    {
-        (tiles[i1, j1], tiles[i2, j2]) = (tiles[i2, j2], tiles[i1, j1]);
     }
 }

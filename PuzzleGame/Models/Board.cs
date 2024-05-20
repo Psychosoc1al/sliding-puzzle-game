@@ -6,19 +6,17 @@ public class Board : IObservable
 {
     private readonly List<IObserver> _observers;
     private readonly List<IWinObserver> _winObservers;
-    private readonly IShuffleStrategy _shuffleStrategy;
 
     public int Size { get; }
 
     public Tile[,] Tiles { get; }
 
-    public Board(int size, IShuffleStrategy shuffleStrategy)
+    public Board(int size)
     {
         Size = size;
         Tiles = new Tile[size, size];
         _observers = new List<IObserver>();
         _winObservers = new List<IWinObserver>();
-        _shuffleStrategy = shuffleStrategy;
         InitializeBoard();
     }
 
@@ -34,7 +32,7 @@ public class Board : IObservable
             }
         }
 
-        _shuffleStrategy.Shuffle(Tiles, Size);
+        Shuffler.Shuffle(Tiles, Size);
     }
 
 
@@ -54,19 +52,17 @@ public class Board : IObservable
         foreach (var observer in _observers) observer.Update();
     }
 
-    private void Swap(int i1, int j1, int i2, int j2)
-    {
-        (Tiles[i1, j1], Tiles[i2, j2]) = (Tiles[i2, j2], Tiles[i1, j1]);
-    }
-
 
     public void MoveTile(int row, int col)
     {
         if (Tiles[row, col].IsEmpty) return;
+
         var (emptyRow, emptyCol) = FindEmptyTile();
         if (Math.Abs(emptyRow - row) + Math.Abs(emptyCol - col) != 1) return;
-        Swap(row, col, emptyRow, emptyCol);
+
+        Shuffler.Swap(Tiles, row, col, emptyRow, emptyCol);
         NotifyObservers();
+
         if (CheckWin()) NotifyWinObservers();
     }
 

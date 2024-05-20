@@ -1,8 +1,7 @@
-namespace PuzzleGame.Models
+namespace PuzzleGame.Models;
+
+public class Tile(int number)
 {
-    public class Tile(int number)
-    {
-        public int Number { get; } = number;
-        public bool IsEmpty => Number == 0;
-    }
+    public int Number { get; } = number;
+    public bool IsEmpty => Number == 0;
 }
