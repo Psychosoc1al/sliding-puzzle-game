@@ -8,7 +8,7 @@ public class RandomShuffleStrategy : IShuffleStrategy
 
     public void Shuffle(Tile[,] tiles, int size)
     {
-        var swapCount = _random.Next(10, 51) * 2;
+        var swapCount = _random.Next((int)Math.Pow(size, 4), (int)Math.Pow(size, 5)) * 2;
         for (var i = 0; i < swapCount; i++)
         {
             var swap1 = GetRandomConsecutiveTiles(size);
@@ -29,7 +29,7 @@ public class RandomShuffleStrategy : IShuffleStrategy
     {
         if (col < size - 1) return [row, col + 1];
 
-        return row < size - 1 ? [row + 1, 0] : [row, col];
+        return row < size - 1 ? [row + 1, 0] : [0, 0];
     }
 
     private static void Swap(Tile[,] tiles, int i1, int j1, int i2, int j2)
