@@ -5,10 +5,7 @@ namespace PuzzleGame.Utilities;
 public class GameManager
 {
     private static readonly Lazy<GameManager> Instance = new(() => new GameManager());
-
-    private GameManager()
-    {
-    }
+    private Strategy? _strategy;
 
     public static GameManager GameInstance => Instance.Value;
 
@@ -17,10 +14,18 @@ public class GameManager
     {
         using var dialog = new StartGameDialog();
         if (dialog.ShowDialog() != DialogResult.OK) return;
+
+        SetStrategy(dialog.IsTimeGame ? new TimeCountStrategy() : new StepsCountStrategy());
         var size = dialog.BoardSize;
         var mainForm = new MainForm();
         var controller = BoardFactory.CreateBoardController(mainForm, size);
         mainForm.SetController(controller);
+
         Application.Run(mainForm);
+    }
+
+    private void SetStrategy(Strategy strategy)
+    {
+        _strategy = strategy;
     }
 }
