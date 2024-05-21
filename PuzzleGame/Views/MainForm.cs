@@ -10,7 +10,10 @@ public class MainForm : Form, IBoardView, IWinObserver
 
     public MainForm()
     {
+        
         InitializeComponent();
+        KeyPreview = true;
+        KeyDown += new KeyEventHandler(CtrlZ);
     }
 
     public void SetController(BoardController? controller)
@@ -18,13 +21,22 @@ public class MainForm : Form, IBoardView, IWinObserver
         _controller = controller;
         _controller?.Board.RegisterObserver(this);
         _controller?.Board.RegisterWinObserver(this);
+        
         UpdateView();
     }
+
+    private void OnKeyPress(object? sender, KeyPressEventArgs e)
+    {
+        MessageBox.Show(e.KeyChar.ToString());
+    }
+
+
 
     public void UpdateView()
     {
         Controls.Clear();
         if (_controller == null) return;
+        
         var tileSize = ClientSize.Width / _controller.Board.Size;
         for (var i = 0; i < _controller.Board.Size; i++)
         {
@@ -56,7 +68,6 @@ public class MainForm : Form, IBoardView, IWinObserver
             }
         }
     }
-
     public new void Update()
     {
         UpdateView();
@@ -96,5 +107,12 @@ public class MainForm : Form, IBoardView, IWinObserver
         MaximizeBox = false;
         StartPosition = FormStartPosition.CenterScreen;
         ResumeLayout(false);
+        
     }
+    private void CtrlZ(object? sender, KeyEventArgs e)
+    {
+        if (e.Modifiers == Keys.Control && e.KeyCode == Keys.Z)
+            _controller.UndoMove();
+    }
+
 }
