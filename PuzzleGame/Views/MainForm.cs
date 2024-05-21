@@ -9,30 +9,33 @@ public class MainForm : Form, IObserver, IWinObserver
     private BoardController? _controller;
     private readonly Label _countTitleLabel;
     private readonly Label _countLabel;
+    private Font? _tileFont;
 
     public MainForm()
     {
-
         InitializeComponent();
         _countTitleLabel = new Label
         {
             Name = "textField",
             Text = "Счёт:",
-            Top = 7,
-            Left = 150,
+            Top = 0,
+            Left = 70,
             Height = 100,
-            Font = new Font("Comfortaa", 13, FontStyle.Bold),
+            Width = 150,
+            Font = new Font("Comfortaa", 15, FontStyle.Bold),
         };
 
         _countLabel = new Label
         {
             Name = "textField",
-            Text = "123",
-            Top = 7,
-            Left = 350,
+            Text = "12",
+            TextAlign = ContentAlignment.TopRight,
+            Top = 0,
+            Left = 270,
             Height = 100,
-            Font = new Font("Comfortaa", 13, FontStyle.Bold),
+            Font = new Font("Comfortaa", 15, FontStyle.Bold),
         };
+
         KeyPreview = true;
         KeyDown += CtrlZ;
     }
@@ -51,6 +54,7 @@ public class MainForm : Form, IObserver, IWinObserver
         Controls.Clear();
         GC.Collect();
         if (_controller == null) return;
+        _tileFont ??= new Font("Comfortaa", (int)(60.0 / _controller.Board.Size)!, FontStyle.Bold);
 
         const int offset = 50;
         var tileSize = ClientSize.Width / _controller.Board.Size;
@@ -67,8 +71,9 @@ public class MainForm : Form, IObserver, IWinObserver
                     Text = _controller.Board.Tiles[i, j].Number.ToString(),
                     BackColor = Color.FromArgb(CountTileAlpha(i, j), _controller.TileColor),
                     ForeColor = Color.FromArgb(255, 67, 67, 67),
-                    Font = new Font("Comfortaa", (int)(60.0 / _controller.Board.Size), FontStyle.Bold)
+                    Font = _tileFont
                 };
+
                 if (_controller.Board.Tiles[i, j].IsEmpty)
                 {
                     tileButton.Text = "";
@@ -80,7 +85,6 @@ public class MainForm : Form, IObserver, IWinObserver
                     var row = i;
                     var col = j;
                     tileButton.Click += (_, _) => _controller.MoveTile(row, col);
-                    tileButton.BackColor = Color.White;
                 }
 
                 Controls.Add(tileButton);
@@ -110,7 +114,7 @@ public class MainForm : Form, IObserver, IWinObserver
     {
         if (_controller == null) return;
         var count = _controller.Counter.Count;
-        MessageBox.Show($"Congratulations! You've solved the puzzle!\nMoves: {count}\nRestarting the game.", "You Win!",
+        MessageBox.Show($"Поздравляем! Вы выиграли!\nВаш счёт: {count}\nХотите начать заново?", "Победа!",
             MessageBoxButtons.OK, MessageBoxIcon.Information);
         RestartGame();
     }
@@ -129,6 +133,12 @@ public class MainForm : Form, IObserver, IWinObserver
         Show();
     }
 
+    private void CtrlZ(object? sender, KeyEventArgs e)
+    {
+        if (e is { Modifiers: Keys.Control, KeyCode: Keys.Z })
+            _controller?.UndoMove();
+    }
+
     private void InitializeComponent()
     {
         SuspendLayout();
@@ -141,12 +151,5 @@ public class MainForm : Form, IObserver, IWinObserver
         MaximizeBox = false;
         StartPosition = FormStartPosition.CenterScreen;
         ResumeLayout(false);
-
     }
-    private void CtrlZ(object? sender, KeyEventArgs e)
-    {
-        if (e is { Modifiers: Keys.Control, KeyCode: Keys.Z })
-            _controller?.UndoMove();
-    }
-
 }
