@@ -10,6 +10,7 @@ public class MainForm : Form, IObserver, IWinObserver
     private readonly Label _countTitleLabel;
     private readonly Label _countLabel;
     private Font? _tileFont;
+    private Button[,]? _buttons;
 
     public MainForm()
     {
@@ -22,7 +23,7 @@ public class MainForm : Form, IObserver, IWinObserver
             Left = 70,
             Height = 100,
             Width = 150,
-            Font = new Font("Comfortaa", 15, FontStyle.Bold),
+            Font = new Font("Comfortaa", 15, FontStyle.Bold)
         };
 
         _countLabel = new Label
@@ -33,8 +34,9 @@ public class MainForm : Form, IObserver, IWinObserver
             Top = 0,
             Left = 270,
             Height = 100,
-            Font = new Font("Comfortaa", 15, FontStyle.Bold),
+            Font = new Font("Comfortaa", 15, FontStyle.Bold)
         };
+
 
         KeyPreview = true;
         KeyDown += CtrlZ;
@@ -46,48 +48,57 @@ public class MainForm : Form, IObserver, IWinObserver
         _controller?.Board.RegisterObserver(this);
         _controller?.Board.RegisterWinObserver(this);
 
-        UpdateView();
-    }
-
-    private void UpdateView()
-    {
-        Controls.Clear();
-        GC.Collect();
-        if (_controller == null) return;
-        _tileFont ??= new Font("Comfortaa", (int)(60.0 / _controller.Board.Size)!, FontStyle.Bold);
 
         const int offset = 50;
-        var tileSize = ClientSize.Width / _controller.Board.Size;
-        for (var i = 0; i < _controller.Board.Size; i++)
+        var tileSize = ClientSize.Width / _controller!.Board.Size;
+        _tileFont ??= new Font("Comfortaa", (int)(60.0 / _controller.Board.Size)!, FontStyle.Bold);
+        var size = _controller!.Board.Size;
+        _buttons = new Button[size, size];
+        for (var i = 0; i < size; i++)
         {
-            for (var j = 0; j < _controller.Board.Size; j++)
+            for (var j = 0; j < size; j++)
             {
-                var tileButton = new Button
+                _buttons[i, j] = new Button
                 {
                     Width = tileSize,
                     Height = tileSize,
                     Left = j * tileSize,
                     Top = i * tileSize + offset,
                     Text = _controller.Board.Tiles[i, j].Number.ToString(),
-                    BackColor = Color.FromArgb(CountTileAlpha(i, j), _controller.TileColor),
-                    ForeColor = Color.FromArgb(255, 67, 67, 67),
                     Font = _tileFont
                 };
 
+                var row = i;
+                var col = j;
+                _buttons[i, j].Click += (_, _) => _controller.MoveTile(row, col);
+
+                Controls.Add(_buttons[i, j]);
+            }
+        }
+
+        UpdateView();
+    }
+
+    private void UpdateView()
+    {
+        Controls.Clear();
+        if (_controller == null) return;
+        for (var i = 0; i < _controller.Board.Size; i++)
+        {
+            for (var j = 0; j < _controller.Board.Size; j++)
+            {
+                _buttons[i, j].Text = _controller.Board.Tiles[i, j].Number.ToString();
+                _buttons[i, j].BackColor = Color.FromArgb(CountTileAlpha(i, j), _controller.TileColor);
+                _buttons[i, j].Enabled = true;
+
                 if (_controller.Board.Tiles[i, j].IsEmpty)
                 {
-                    tileButton.Text = "";
-                    tileButton.BackColor = Color.White;
-                    tileButton.Enabled = false;
-                }
-                else
-                {
-                    var row = i;
-                    var col = j;
-                    tileButton.Click += (_, _) => _controller.MoveTile(row, col);
+                    _buttons[i, j].Text = "";
+                    _buttons[i, j].BackColor = Color.White;
+                    _buttons[i, j].Enabled = false;
                 }
 
-                Controls.Add(tileButton);
+                Controls.Add(_buttons[i, j]);
             }
         }
 

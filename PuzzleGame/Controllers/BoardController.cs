@@ -9,7 +9,7 @@ public class BoardController
     public Board Board { get; }
     public Color TileColor { get; }
     private readonly Stack<ICommand> _commands = new();
-    public Counter Counter;
+    public readonly Counter Counter;
 
     public BoardController(MainForm view, Board board, Counter counter)
     {
@@ -22,9 +22,9 @@ public class BoardController
             4 => Color.DarkOrange,
             _ => Color.Tomato
         };
-        Board.RegisterObserver(view);
-        Board.RegisterObserver(counter);
-        view.SetController(this);
+        // Board.RegisterObserver(view);
+        Board.RegisterObserver(counter);  // TODO
+        // view.SetController(this);
     }
 
     public void MoveTile(int row, int col)

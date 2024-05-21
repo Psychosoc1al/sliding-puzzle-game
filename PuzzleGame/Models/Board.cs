@@ -9,12 +9,13 @@ public class Board : IObservable
     public StatusEnum Status { get; set; }
 
     public int Size { get; }
-
+    private (int, int) EmptyTile { get; set; }
     public Tile[,] Tiles { get; }
 
     public Board(int size)
     {
         Size = size;
+        EmptyTile = (size - 1, size - 1);
         Tiles = new Tile[size, size];
         _observers = new List<IObserver>();
         _winObservers = new List<IWinObserver>();
@@ -55,30 +56,19 @@ public class Board : IObservable
 
     public (int, int) MoveTile(int row, int col)
     {
-        if (Tiles[row, col].IsEmpty) return (0,0);
+        if (Tiles[row, col].IsEmpty) return (0, 0);
 
-        var (emptyRow, emptyCol) = FindEmptyTile();
-        if (Math.Abs(emptyRow - row) + Math.Abs(emptyCol - col) != 1) return (0,0);
+        var (emptyRow, emptyCol) = EmptyTile;
+        if (Math.Abs(emptyRow - row) + Math.Abs(emptyCol - col) != 1) return (0, 0);
 
         Shuffler.Swap(Tiles, row, col, emptyRow, emptyCol);
         NotifyObservers();
+        EmptyTile = (row, col);
 
         if (CheckWin()) NotifyWinObservers();
         return (emptyRow, emptyCol);
     }
 
-
-    private (int, int) FindEmptyTile()
-    {
-        for (var i = 0; i < Size; i++)
-        {
-            for (var j = 0; j < Size; j++)
-                if (Tiles[i, j].IsEmpty)
-                    return (i, j);
-        }
-
-        return (-1, -1);
-    }
 
     private bool CheckWin()
     {
