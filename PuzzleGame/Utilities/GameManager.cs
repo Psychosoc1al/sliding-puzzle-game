@@ -1,3 +1,5 @@
+using PuzzleGame.Controllers;
+using PuzzleGame.Models;
 using PuzzleGame.Views;
 
 namespace PuzzleGame.Utilities
@@ -20,7 +22,9 @@ namespace PuzzleGame.Utilities
             var size = dialog.BoardSize;
             var mainForm = new MainForm();
             var shuffleStrategy = new RandomShuffleStrategy();
-            var controller = BoardFactory.CreateBoardController(mainForm, size, shuffleStrategy);
+            var board = new Board(size, shuffleStrategy);
+            var counter = new Counter(board);
+            var controller = new BoardController(mainForm, board, counter);
             mainForm.SetController(controller);
             Application.Run(mainForm);
         }
