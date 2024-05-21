@@ -7,7 +7,7 @@ namespace PuzzleGame.Views;
 public class MainForm : Form, IObserver, IWinObserver
 {
     private BoardController? _controller;
-    private readonly Label _countTitleLabel;
+    private readonly Label _countTypeLabel;
     private readonly Label _countLabel;
     private Font? _tileFont;
     private Button[,]? _buttons;
@@ -15,7 +15,7 @@ public class MainForm : Form, IObserver, IWinObserver
     public MainForm()
     {
         InitializeComponent();
-        _countTitleLabel = new Label
+        _countTypeLabel = new Label
         {
             Name = "textField",
             Text = "Счёт:",
@@ -29,14 +29,13 @@ public class MainForm : Form, IObserver, IWinObserver
         _countLabel = new Label
         {
             Name = "textField",
-            Text = "12",
+            Text = "0",
             TextAlign = ContentAlignment.TopRight,
             Top = 0,
             Left = 270,
             Height = 100,
             Font = new Font("Comfortaa", 15, FontStyle.Bold)
         };
-
 
         KeyPreview = true;
         KeyDown += CtrlZ;
@@ -102,7 +101,7 @@ public class MainForm : Form, IObserver, IWinObserver
             }
         }
 
-        Controls.Add(_countTitleLabel);
+        Controls.Add(_countTypeLabel);
         Controls.Add(_countLabel);
     }
 
@@ -116,6 +115,16 @@ public class MainForm : Form, IObserver, IWinObserver
         return (int)(_controller.Board.Tiles[row, col].Number * multiplier / (size * size) + offset);
     }
 
+    public void SetCountType(string countType)
+    {
+        _countTypeLabel.Text = countType;
+    }
+
+    public void SetCount(string count)
+    {
+        _countLabel.Text = count;
+    }
+
     public new void Update()
     {
         UpdateView();
@@ -124,9 +133,13 @@ public class MainForm : Form, IObserver, IWinObserver
     public void OnWin()
     {
         if (_controller == null) return;
-        var count = _controller.Counter.Count;
-        MessageBox.Show($"Поздравляем! Вы выиграли!\nВаш счёт: {count}\nХотите начать заново?", "Победа!",
-            MessageBoxButtons.OK, MessageBoxIcon.Information);
+        MessageBox.Show(
+            $"Поздравляем! Вы выиграли!\nХотите начать заново?",
+            "Победа!",
+            MessageBoxButtons.OK,
+            MessageBoxIcon.Information
+        );
+
         RestartGame();
     }
 
@@ -134,12 +147,13 @@ public class MainForm : Form, IObserver, IWinObserver
     {
         Hide();
         using var dialog = new StartGameDialog();
-        if (dialog.ShowDialog() != DialogResult.OK) return;
+        if (dialog.ShowDialog() != DialogResult.OK) Application.Exit();
 
         var size = dialog.BoardSize;
         var board = new Board(size);
-        var counter = new Counter(board);
-        var newController = new BoardController(this, board, counter);
+        GameManager.GameInstance.SetStrategy(dialog.IsTimeGame, board, this);
+        GameManager.GameInstance.Strategy?.Execute();
+        var newController = new BoardController(this, board);
         SetController(newController);
         Show();
     }

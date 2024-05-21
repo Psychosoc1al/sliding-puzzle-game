@@ -43,16 +43,10 @@ public class Board : IObservable
         _observers.Add(observer);
     }
 
-    public void RemoveObserver(IObserver observer)
-    {
-        _observers.Remove(observer);
-    }
-
     public void NotifyObservers()
     {
         foreach (var observer in _observers) observer.Update();
     }
-
 
     public (int, int) MoveTile(int row, int col)
     {
@@ -88,17 +82,12 @@ public class Board : IObservable
 
     public void RegisterWinObserver(IWinObserver winObserver)
     {
-        _winObservers.Clear();
-        _winObservers.Add(winObserver);
-    }
-
-    public void RemoveWinObserver(IWinObserver winObserver)
-    {
-        _winObservers.Remove(winObserver);
+        _winObservers.Insert(0, winObserver);
     }
 
     private void NotifyWinObservers()
     {
         foreach (var winObserver in _winObservers) winObserver.OnWin();
+        _winObservers.Clear();
     }
 }

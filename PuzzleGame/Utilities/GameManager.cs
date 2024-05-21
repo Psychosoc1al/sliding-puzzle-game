@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using PuzzleGame.Controllers;
 using PuzzleGame.Models;
 using PuzzleGame.Views;
@@ -7,29 +8,32 @@ namespace PuzzleGame.Utilities;
 public class GameManager
 {
     private static readonly Lazy<GameManager> Instance = new(() => new GameManager());
-    private Strategy? _strategy;
+    public IStrategy? Strategy { get; private set; }
 
     public static GameManager GameInstance => Instance.Value;
 
-
+    [SuppressMessage("Performance", "CA1822:Mark members as static")]
     public void StartGame()
     {
         using var dialog = new StartGameDialog();
         if (dialog.ShowDialog() != DialogResult.OK) return;
 
-        SetStrategy(dialog.IsTimeGame ? new TimeCountStrategy() : new StepsCountStrategy());
         var size = dialog.BoardSize;
         var mainForm = new MainForm();
         var board = new Board(size);
-        var counter = new Counter(board);
-        var controller = new BoardController(mainForm, board, counter);
+        var controller = new BoardController(mainForm, board);
         mainForm.SetController(controller);
+
+        SetStrategy(dialog.IsTimeGame, board, mainForm);
+        Strategy?.Execute();
 
         Application.Run(mainForm);
     }
 
-    private void SetStrategy(Strategy strategy)
+    public void SetStrategy(bool isTimeGame, Board board, MainForm mainForm)
     {
-        _strategy = strategy;
+        Strategy = isTimeGame
+            ? new TimeCountStrategy(board, mainForm)
+            : new StepsCountStrategy(board, mainForm);
     }
 }

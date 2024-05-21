@@ -1,6 +1,6 @@
 namespace PuzzleGame.Utilities;
 
-public abstract class Strategy
+public interface IStrategy
 {
-    public abstract void Execute();
+    public void Execute();
 }

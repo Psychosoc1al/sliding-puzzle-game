@@ -9,22 +9,17 @@ public class BoardController
     public Board Board { get; }
     public Color TileColor { get; }
     private readonly Stack<ICommand> _commands = new();
-    public readonly Counter Counter;
 
-    public BoardController(MainForm view, Board board, Counter counter)
+    public BoardController(MainForm view, Board board)
     {
         Board = board;
         Board.Status = StatusEnum.StartGame;
-        Counter = counter;
         TileColor = board.Size switch
         {
             3 => Color.SpringGreen,
             4 => Color.DarkOrange,
             _ => Color.Tomato
         };
-        // Board.RegisterObserver(view);
-        Board.RegisterObserver(counter);  // TODO
-        // view.SetController(this);
     }
 
     public void MoveTile(int row, int col)
