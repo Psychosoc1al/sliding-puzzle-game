@@ -78,7 +78,9 @@ public class MainForm : Form, IBoardView, IWinObserver
         if (dialog.ShowDialog() != DialogResult.OK) return;
         var size = dialog.BoardSize;
         var shuffleStrategy = new RandomShuffleStrategy();
-        var newController = BoardFactory.CreateBoardController(this, size, shuffleStrategy);
+        var board = new Board(size, shuffleStrategy);
+        var counter = new Counter(board);
+        var newController = new BoardController(this, board, counter);
         SetController(newController);
         Show();
     }
