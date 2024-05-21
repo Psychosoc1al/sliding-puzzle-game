@@ -6,10 +6,31 @@ namespace PuzzleGame.Views;
 public class MainForm : Form, IObserver, IWinObserver
 {
     private BoardController? _controller;
+    private readonly Label _countTitleLabel;
+    private readonly Label _countLabel;
 
     public MainForm()
     {
         InitializeComponent();
+        _countTitleLabel = new Label
+        {
+            Name = "textField",
+            Text = "Счёт:",
+            Top = 7,
+            Left = 150,
+            Height = 100,
+            Font = new Font("Comfortaa", 13, FontStyle.Bold),
+        };
+
+        _countLabel = new Label
+        {
+            Name = "textField",
+            Text = "123",
+            Top = 7,
+            Left = 350,
+            Height = 100,
+            Font = new Font("Comfortaa", 13, FontStyle.Bold),
+        };
     }
 
     public void SetController(BoardController? controller)
@@ -24,6 +45,8 @@ public class MainForm : Form, IObserver, IWinObserver
     {
         Controls.Clear();
         if (_controller == null) return;
+
+        const int offset = 50;
         var tileSize = ClientSize.Width / _controller.Board.Size;
         for (var i = 0; i < _controller.Board.Size; i++)
         {
@@ -34,7 +57,7 @@ public class MainForm : Form, IObserver, IWinObserver
                     Width = tileSize,
                     Height = tileSize,
                     Left = j * tileSize,
-                    Top = i * tileSize,
+                    Top = i * tileSize + offset,
                     Text = _controller.Board.Tiles[i, j].Number.ToString(),
                     BackColor = Color.FromArgb(CountTileAlpha(i, j), _controller.TileColor),
                     ForeColor = Color.FromArgb(255, 67, 67, 67),
@@ -56,6 +79,9 @@ public class MainForm : Form, IObserver, IWinObserver
                 Controls.Add(tileButton);
             }
         }
+
+        Controls.Add(_countTitleLabel);
+        Controls.Add(_countLabel);
     }
 
     private int CountTileAlpha(int row, int col)
@@ -95,9 +121,10 @@ public class MainForm : Form, IObserver, IWinObserver
     {
         SuspendLayout();
 
-        ClientSize = new Size(500, 500);
+        MinimumSize = new Size(500, 583);
+        FormBorderStyle = FormBorderStyle.FixedDialog;
         Name = "MainForm";
-        Text = "Sliding Puzzle Game";
+        Text = "Пятнашки";
         DoubleBuffered = true;
         MaximizeBox = false;
         StartPosition = FormStartPosition.CenterScreen;
