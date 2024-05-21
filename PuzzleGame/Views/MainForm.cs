@@ -1,4 +1,5 @@
 using PuzzleGame.Controllers;
+using PuzzleGame.Models;
 using PuzzleGame.Utilities;
 
 namespace PuzzleGame.Views;
@@ -11,6 +12,7 @@ public class MainForm : Form, IObserver, IWinObserver
 
     public MainForm()
     {
+
         InitializeComponent();
         _countTitleLabel = new Label
         {
@@ -31,6 +33,8 @@ public class MainForm : Form, IObserver, IWinObserver
             Height = 100,
             Font = new Font("Comfortaa", 13, FontStyle.Bold),
         };
+        KeyPreview = true;
+        KeyDown += CtrlZ;
     }
 
     public void SetController(BoardController? controller)
@@ -38,12 +42,14 @@ public class MainForm : Form, IObserver, IWinObserver
         _controller = controller;
         _controller?.Board.RegisterObserver(this);
         _controller?.Board.RegisterWinObserver(this);
+
         UpdateView();
     }
 
     private void UpdateView()
     {
         Controls.Clear();
+        GC.Collect();
         if (_controller == null) return;
 
         const int offset = 50;
@@ -74,6 +80,7 @@ public class MainForm : Form, IObserver, IWinObserver
                     var row = i;
                     var col = j;
                     tileButton.Click += (_, _) => _controller.MoveTile(row, col);
+                    tileButton.BackColor = Color.White;
                 }
 
                 Controls.Add(tileButton);
@@ -101,7 +108,9 @@ public class MainForm : Form, IObserver, IWinObserver
 
     public void OnWin()
     {
-        MessageBox.Show("Congratulations! You've solved the puzzle! Restarting the game.", "You Win!",
+        if (_controller == null) return;
+        var count = _controller.Counter.Count;
+        MessageBox.Show($"Congratulations! You've solved the puzzle!\nMoves: {count}\nRestarting the game.", "You Win!",
             MessageBoxButtons.OK, MessageBoxIcon.Information);
         RestartGame();
     }
@@ -111,8 +120,11 @@ public class MainForm : Form, IObserver, IWinObserver
         Hide();
         using var dialog = new StartGameDialog();
         if (dialog.ShowDialog() != DialogResult.OK) return;
+
         var size = dialog.BoardSize;
-        var newController = BoardFactory.CreateBoardController(this, size);
+        var board = new Board(size);
+        var counter = new Counter(board);
+        var newController = new BoardController(this, board, counter);
         SetController(newController);
         Show();
     }
@@ -129,5 +141,12 @@ public class MainForm : Form, IObserver, IWinObserver
         MaximizeBox = false;
         StartPosition = FormStartPosition.CenterScreen;
         ResumeLayout(false);
+
     }
+    private void CtrlZ(object? sender, KeyEventArgs e)
+    {
+        if (e is { Modifiers: Keys.Control, KeyCode: Keys.Z })
+            _controller?.UndoMove();
+    }
+
 }

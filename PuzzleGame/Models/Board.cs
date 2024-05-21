@@ -6,6 +6,7 @@ public class Board : IObservable
 {
     private readonly List<IObserver> _observers;
     private readonly List<IWinObserver> _winObservers;
+    public StatusEnum Status { get; set; }
 
     public int Size { get; }
 
@@ -38,7 +39,6 @@ public class Board : IObservable
 
     public void RegisterObserver(IObserver observer)
     {
-        _observers.Clear();
         _observers.Add(observer);
     }
 
@@ -53,17 +53,18 @@ public class Board : IObservable
     }
 
 
-    public void MoveTile(int row, int col)
+    public (int, int) MoveTile(int row, int col)
     {
-        if (Tiles[row, col].IsEmpty) return;
+        if (Tiles[row, col].IsEmpty) return (0,0);
 
         var (emptyRow, emptyCol) = FindEmptyTile();
-        if (Math.Abs(emptyRow - row) + Math.Abs(emptyCol - col) != 1) return;
+        if (Math.Abs(emptyRow - row) + Math.Abs(emptyCol - col) != 1) return (0,0);
 
         Shuffler.Swap(Tiles, row, col, emptyRow, emptyCol);
         NotifyObservers();
 
         if (CheckWin()) NotifyWinObservers();
+        return (emptyRow, emptyCol);
     }
 
 

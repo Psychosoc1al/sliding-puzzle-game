@@ -1,3 +1,5 @@
+using PuzzleGame.Controllers;
+using PuzzleGame.Models;
 using PuzzleGame.Views;
 
 namespace PuzzleGame.Utilities;
@@ -18,7 +20,9 @@ public class GameManager
         SetStrategy(dialog.IsTimeGame ? new TimeCountStrategy() : new StepsCountStrategy());
         var size = dialog.BoardSize;
         var mainForm = new MainForm();
-        var controller = BoardFactory.CreateBoardController(mainForm, size);
+        var board = new Board(size);
+        var counter = new Counter(board);
+        var controller = new BoardController(mainForm, board, counter);
         mainForm.SetController(controller);
 
         Application.Run(mainForm);

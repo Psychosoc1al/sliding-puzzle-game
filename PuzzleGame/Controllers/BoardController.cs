@@ -9,10 +9,13 @@ public class BoardController
     public Board Board { get; }
     public Color TileColor { get; }
     private readonly Stack<ICommand> _commands = new();
+    public Counter Counter;
 
-    public BoardController(MainForm view, Board board)
+    public BoardController(MainForm view, Board board, Counter counter)
     {
         Board = board;
+        Board.Status = StatusEnum.StartGame;
+        Counter = counter;
         TileColor = board.Size switch
         {
             3 => Color.SpringGreen,
@@ -20,11 +23,13 @@ public class BoardController
             _ => Color.Tomato
         };
         Board.RegisterObserver(view);
+        Board.RegisterObserver(counter);
         view.SetController(this);
     }
 
     public void MoveTile(int row, int col)
     {
+        Board.Status = StatusEnum.Move;
         var command = new MoveTileCommand(Board, row, col);
         command.Execute();
         _commands.Push(command);
@@ -32,6 +37,7 @@ public class BoardController
 
     public void UndoMove()
     {
+        Board.Status = StatusEnum.UndoMove;
         if (_commands.Count <= 0) return;
         var command = _commands.Pop();
         command.Undo();
