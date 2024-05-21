@@ -60,14 +60,15 @@ public class Board : IObservable
     }
 
 
-    public void MoveTile(int row, int col)
+    public (int, int) MoveTile(int row, int col)
     {
-        if (Tiles[row, col].IsEmpty) return;
+        if (Tiles[row, col].IsEmpty) return (0,0);
         var (emptyRow, emptyCol) = FindEmptyTile();
-        if (Math.Abs(emptyRow - row) + Math.Abs(emptyCol - col) != 1) return;
+        if (Math.Abs(emptyRow - row) + Math.Abs(emptyCol - col) != 1) return (0,0);
         Swap(row, col, emptyRow, emptyCol);
         NotifyObservers();
         if (CheckWin()) NotifyWinObservers();
+        return (emptyRow, emptyCol);
     }
 
 
