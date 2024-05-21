@@ -1,7 +1,6 @@
-namespace PuzzleGame.Utilities
+namespace PuzzleGame.Utilities;
+
+public interface IObserver
 {
-    public interface IObserver
-    {
-        void Update();
-    }
+    void Update();
 }

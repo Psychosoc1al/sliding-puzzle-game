@@ -1,9 +1,8 @@
-namespace PuzzleGame.Utilities
+namespace PuzzleGame.Utilities;
+
+public interface IObservable
 {
-    public interface IObservable
-    {
-        void RegisterObserver(IObserver observer);
-        void RemoveObserver(IObserver observer);
-        void NotifyObservers();
-    }
+    void RegisterObserver(IObserver observer);
+    void RemoveObserver(IObserver observer);
+    void NotifyObservers();
 }

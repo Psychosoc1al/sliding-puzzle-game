@@ -1,7 +1,6 @@
-namespace PuzzleGame.Utilities
+namespace PuzzleGame.Utilities;
+
+public interface IWinObserver
 {
-    public interface IWinObserver
-    {
-        void OnWin();
-    }
+    void OnWin();
 }
