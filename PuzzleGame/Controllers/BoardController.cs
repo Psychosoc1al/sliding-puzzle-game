@@ -13,7 +13,7 @@ public class BoardController
     public BoardController(MainForm view, Board board)
     {
         Board = board;
-        Board.Status = StatusEnum.StartGame;
+        Board.Status = Status.StartGame;
         TileColor = board.Size switch
         {
             3 => Color.SpringGreen,
@@ -24,7 +24,7 @@ public class BoardController
 
     public void MoveTile(int row, int col)
     {
-        Board.Status = StatusEnum.Move;
+        Board.Status = Status.Move;
         var command = new MoveTileCommand(Board, row, col);
         command.Execute();
         _commands.Push(command);
@@ -32,7 +32,7 @@ public class BoardController
 
     public void UndoMove()
     {
-        Board.Status = StatusEnum.UndoMove;
+        Board.Status = Status.UndoMove;
         if (_commands.Count <= 0) return;
         var command = _commands.Pop();
         command.Undo();

@@ -12,13 +12,13 @@ public class StepsCountStrategy(Board boardObservable, MainForm mainForm) : IObs
         var statusEnum = boardObservable.Status;
         switch (statusEnum)
         {
-            case StatusEnum.StartGame:
+            case Status.StartGame:
                 Count = 0;
                 break;
-            case StatusEnum.Move:
+            case Status.Move:
                 Count++;
                 break;
-            case StatusEnum.UndoMove:
+            case Status.UndoMove:
                 Count--;
                 break;
             default:

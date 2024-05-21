@@ -6,7 +6,7 @@ public class Board : IObservable
 {
     private readonly List<IObserver> _observers;
     private readonly List<IWinObserver> _winObservers;
-    public StatusEnum Status { get; set; }
+    public Status Status { get; set; }
 
     public int Size { get; }
     private (int, int) EmptyTile { get; set; }
@@ -26,12 +26,10 @@ public class Board : IObservable
     {
         var number = 1;
         for (var i = 0; i < Size; i++)
+        for (var j = 0; j < Size; j++)
         {
-            for (var j = 0; j < Size; j++)
-            {
-                Tiles[i, j] = new Tile(number % (Size * Size));
-                number++;
-            }
+            Tiles[i, j] = new Tile(number % (Size * Size));
+            number++;
         }
 
         Shuffler.Shuffle(Tiles, Size);
@@ -68,13 +66,11 @@ public class Board : IObservable
     {
         var expectedNumber = 1;
         for (var i = 0; i < Size; i++)
+        for (var j = 0; j < Size; j++)
         {
-            for (var j = 0; j < Size; j++)
-            {
-                if (i == Size - 1 && j == Size - 1) break;
-                if (Tiles[i, j].Number != expectedNumber) return false;
-                expectedNumber++;
-            }
+            if (i == Size - 1 && j == Size - 1) break;
+            if (Tiles[i, j].Number != expectedNumber) return false;
+            expectedNumber++;
         }
 
         return true;

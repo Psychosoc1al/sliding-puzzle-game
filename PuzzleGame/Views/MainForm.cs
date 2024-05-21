@@ -54,25 +54,23 @@ public class MainForm : Form, IObserver, IWinObserver
         var size = _controller!.Board.Size;
         _buttons = new Button[size, size];
         for (var i = 0; i < size; i++)
+        for (var j = 0; j < size; j++)
         {
-            for (var j = 0; j < size; j++)
+            _buttons[i, j] = new Button
             {
-                _buttons[i, j] = new Button
-                {
-                    Width = tileSize,
-                    Height = tileSize,
-                    Left = j * tileSize,
-                    Top = i * tileSize + offset,
-                    Text = _controller.Board.Tiles[i, j].Number.ToString(),
-                    Font = _tileFont
-                };
+                Width = tileSize,
+                Height = tileSize,
+                Left = j * tileSize,
+                Top = i * tileSize + offset,
+                Text = _controller.Board.Tiles[i, j].Number.ToString(),
+                Font = _tileFont
+            };
 
-                var row = i;
-                var col = j;
-                _buttons[i, j].Click += (_, _) => _controller.MoveTile(row, col);
+            var row = i;
+            var col = j;
+            _buttons[i, j].Click += (_, _) => _controller.MoveTile(row, col);
 
-                Controls.Add(_buttons[i, j]);
-            }
+            Controls.Add(_buttons[i, j]);
         }
 
         UpdateView();
@@ -83,22 +81,20 @@ public class MainForm : Form, IObserver, IWinObserver
         Controls.Clear();
         if (_controller == null) return;
         for (var i = 0; i < _controller.Board.Size; i++)
+        for (var j = 0; j < _controller.Board.Size; j++)
         {
-            for (var j = 0; j < _controller.Board.Size; j++)
+            _buttons[i, j].Text = _controller.Board.Tiles[i, j].Number.ToString();
+            _buttons[i, j].BackColor = Color.FromArgb(CountTileAlpha(i, j), _controller.TileColor);
+            _buttons[i, j].Enabled = true;
+
+            if (_controller.Board.Tiles[i, j].IsEmpty)
             {
-                _buttons[i, j].Text = _controller.Board.Tiles[i, j].Number.ToString();
-                _buttons[i, j].BackColor = Color.FromArgb(CountTileAlpha(i, j), _controller.TileColor);
-                _buttons[i, j].Enabled = true;
-
-                if (_controller.Board.Tiles[i, j].IsEmpty)
-                {
-                    _buttons[i, j].Text = "";
-                    _buttons[i, j].BackColor = Color.White;
-                    _buttons[i, j].Enabled = false;
-                }
-
-                Controls.Add(_buttons[i, j]);
+                _buttons[i, j].Text = "";
+                _buttons[i, j].BackColor = Color.White;
+                _buttons[i, j].Enabled = false;
             }
+
+            Controls.Add(_buttons[i, j]);
         }
 
         Controls.Add(_countTypeLabel);
@@ -134,7 +130,7 @@ public class MainForm : Form, IObserver, IWinObserver
     {
         if (_controller == null) return;
         MessageBox.Show(
-            $"Поздравляем! Вы выиграли!\nХотите начать заново?",
+            "Поздравляем! Вы выиграли!\nХотите начать заново?",
             "Победа!",
             MessageBoxButtons.OK,
             MessageBoxIcon.Information
