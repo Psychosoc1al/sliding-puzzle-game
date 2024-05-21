@@ -2,28 +2,20 @@ using PuzzleGame.Models;
 
 namespace PuzzleGame.Utilities;
 
-public class MoveTileCommand: ICommand
+public class MoveTileCommand(Board board, int row, int col) : ICommand
 {
-    private Board _board;
-    private int _row;
-    private int _col;
-    private int _row_old;
-    private int _col_old;
-    public MoveTileCommand(Board board, int row, int col)
-    {
-        _board = board;
-        _row = row;
-        _col = col;
-        _row_old = row;
-        _col_old = col;
-}
+    private readonly int _row = row;
+    private readonly int _col = col;
+    private int _rowOld = row;
+    private int _colOld = col;
+
     public void Execute()
     {
-        (_row_old, _col_old) = _board.MoveTile(_row, _col);
+        (_rowOld, _colOld) = board.MoveTile(_row, _col);
     }
 
     public void Undo()
     {
-        (_row_old, _col_old) = _board.MoveTile(_row_old, _col_old);
+        (_rowOld, _colOld) = board.MoveTile(_rowOld, _colOld);
     }
 }

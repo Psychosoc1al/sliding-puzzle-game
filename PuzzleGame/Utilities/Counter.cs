@@ -1,21 +1,14 @@
-using PuzzleGame.Controllers;
 using PuzzleGame.Models;
 
 namespace PuzzleGame.Utilities;
 
-public class Counter : IObserver
+public class Counter(IObservable obs) : IObserver
 {
-    public int Count { get; set; }
-    private IObservable _obs;
+    public int Count { get; private set; }
 
-    public Counter(IObservable obs)
-    {
-        _obs = obs;
-        Count = 0;
-    }
     public void Update()
     {
-        StatusEnum statusEnum = ((Board)_obs).Status;
+        var statusEnum = ((Board)obs).Status;
         switch (statusEnum)
         {
             case StatusEnum.StartGame:
@@ -27,6 +20,8 @@ public class Counter : IObserver
             case StatusEnum.UndoMove:
                 Count--;
                 break;
+            default:
+                throw new ArgumentOutOfRangeException();
         }
     }
 }
