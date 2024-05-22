@@ -4,7 +4,7 @@ using Timer = System.Windows.Forms.Timer;
 
 namespace PuzzleGame.Utilities;
 
-public class TimeCountStrategy(Board boardObservable, MainForm mainForm) : IWinObserver, IStrategy
+public class TimeCountStrategy(Board boardObservable, MainForm mainForm) : IWinObserver, IStrategy, IObserver
 {
     private readonly Timer _timer = new();
     private int _elapsedTimeDecimals;
@@ -20,10 +20,21 @@ public class TimeCountStrategy(Board boardObservable, MainForm mainForm) : IWinO
         boardObservable.RegisterWinObserver(this);
         mainForm.SetCount("0.0 c");
         mainForm.SetCountType("Время:");
+        
+        boardObservable.RegisterObserver(this);
+        boardObservable.RegisterWinObserver(this);
 
         _timer.Interval = 100;
         _timer.Tick += Timer_Tick;
-        _timer.Start();
+    }
+
+    public void Update()
+    {
+        if (!_timer.Enabled)
+        {
+            _timer.Start();
+            _elapsedTimeDecimals = 0;
+        }
     }
 
     public void OnWin()
