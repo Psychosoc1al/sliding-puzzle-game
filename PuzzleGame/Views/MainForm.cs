@@ -47,7 +47,6 @@ public class MainForm : Form, IObserver, IWinObserver
         _controller?.Board.RegisterObserver(this);
         _controller?.Board.RegisterWinObserver(this);
 
-
         const int offset = 50;
         var tileSize = ClientSize.Width / _controller!.Board.Size;
         _tileFont ??= new Font("Comfortaa", (int)(60.0 / _controller.Board.Size)!, FontStyle.Bold);
@@ -83,6 +82,7 @@ public class MainForm : Form, IObserver, IWinObserver
         for (var i = 0; i < _controller.Board.Size; i++)
         for (var j = 0; j < _controller.Board.Size; j++)
         {
+            if (_buttons == null) continue;
             _buttons[i, j].Text = _controller.Board.Tiles[i, j].Number.ToString();
             _buttons[i, j].BackColor = Color.FromArgb(CountTileAlpha(i, j), _controller.TileColor);
             _buttons[i, j].Enabled = true;

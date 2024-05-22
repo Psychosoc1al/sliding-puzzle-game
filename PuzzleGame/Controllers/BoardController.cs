@@ -26,8 +26,8 @@ public class BoardController
     {
         Board.Status = Status.Move;
         var command = new MoveTileCommand(Board, row, col);
-        command.Execute();
-        _commands.Push(command);
+        if (command.Execute())
+            _commands.Push(command);
     }
 
     public void UndoMove()

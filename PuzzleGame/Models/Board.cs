@@ -48,10 +48,8 @@ public class Board : IObservable
 
     public (int, int) MoveTile(int row, int col)
     {
-        if (Tiles[row, col].IsEmpty) return (0, 0);
-
         var (emptyRow, emptyCol) = EmptyTile;
-        if (Math.Abs(emptyRow - row) + Math.Abs(emptyCol - col) != 1) return (0, 0);
+        if (Math.Abs(emptyRow - row) + Math.Abs(emptyCol - col) != 1) return (-1, -1);
 
         Shuffler.Swap(Tiles, row, col, emptyRow, emptyCol);
         NotifyObservers();
