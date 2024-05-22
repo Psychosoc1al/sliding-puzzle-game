@@ -4,5 +4,6 @@ public enum Status
 {
     StartGame,
     Move,
-    UndoMove
+    UndoMove,
+    Win
 }

@@ -57,7 +57,11 @@ public class Board : IObservable
         NotifyObservers();
         EmptyTile = (row, col);
 
-        if (CheckWin()) NotifyWinObservers();
+        if (CheckWin())
+        {
+            Status = Status.Win;
+            NotifyWinObservers();
+        }
         return (emptyRow, emptyCol);
     }
 

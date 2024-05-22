@@ -39,13 +39,18 @@ public class GameManager
         var size = _dialog.BoardSize;
         var mainForm = new MainForm();
         var board = new Board(size);
+        mainForm.FormClosed += (_, _) => OnClose(board);
         var newController = new BoardController(mainForm, board);
         mainForm.SetController(newController);
-        
         SetStrategy(_dialog.IsTimeGame, board, mainForm);
         Strategy?.Execute();
         
         Application.Run(mainForm);
         StartGame();
+    }
+    
+    private void OnClose(Board board)
+    {
+        if (board.Status != Status.Win) Application.Exit();
     }
 }
