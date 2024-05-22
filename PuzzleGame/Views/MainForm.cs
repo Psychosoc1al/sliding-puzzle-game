@@ -135,23 +135,7 @@ public class MainForm : Form, IObserver, IWinObserver
             MessageBoxButtons.OK,
             MessageBoxIcon.Information
         );
-
-        RestartGame();
-    }
-
-    private void RestartGame()
-    {
-        Hide();
-        using var dialog = new StartGameDialog();
-        if (dialog.ShowDialog() != DialogResult.OK) Application.Exit();
-
-        var size = dialog.BoardSize;
-        var board = new Board(size);
-        GameManager.GameInstance.SetStrategy(dialog.IsTimeGame, board, this);
-        GameManager.GameInstance.Strategy?.Execute();
-        var newController = new BoardController(this, board);
-        SetController(newController);
-        Show();
+        Close();
     }
 
     private void CtrlZ(object? sender, KeyEventArgs e)
