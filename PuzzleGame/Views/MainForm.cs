@@ -1,6 +1,4 @@
-using PuzzleGame.Controllers;
 using PuzzleGame.Models;
-using PuzzleGame.Utilities;
 
 namespace PuzzleGame.Views;
 
@@ -8,11 +6,10 @@ public class MainForm : Form
 {
     private readonly Label _countTypeLabel;
     private readonly Label _countLabel;
-    private Font? _tileFont;
-    private Button[,]? _buttons;
+    private Button[,] _buttons = new Button[0, 0];
 
-    public event EventHandler CtrlZEvent;
-    public event EventHandler<CustomEventArgs> BtnClickEvent;
+    public event EventHandler CtrlZEvent = delegate { };
+    public event EventHandler<CustomEventArgs> BtnClickEvent = delegate { };
 
     public MainForm()
     {
@@ -40,63 +37,58 @@ public class MainForm : Form
         };
 
         KeyPreview = true;
-        KeyDown += (s, e) =>
+        KeyDown += (_, e) =>
         {
             if (e is { Modifiers: Keys.Control, KeyCode: Keys.Z })
-                CtrlZEvent?.Invoke(this, EventArgs.Empty);
+                CtrlZEvent.Invoke(this, EventArgs.Empty);
         };
-
-
     }
 
-    public void CreateButtons(int board_size, Tile[,] tiles)
+    public void CreateButtons(int boardSize, Tile[,] tiles)
     {
         const int offset = 50;
-        var tileSize = ClientSize.Width / board_size;
-        _tileFont ??= new Font("Comfortaa", (int)(60.0 / board_size)!, FontStyle.Bold);
-        var size = board_size;
-        _buttons = new Button[size, size];
-        for (var i = 0; i < size; i++)
-            for (var j = 0; j < size; j++)
+        var tileSize = ClientSize.Width / boardSize;
+        _buttons = new Button[boardSize, boardSize];
+
+        for (var i = 0; i < boardSize; i++)
+        for (var j = 0; j < boardSize; j++)
+        {
+            _buttons[i, j] = new Button
             {
-                _buttons[i, j] = new Button
-                {
-                    Width = tileSize,
-                    Height = tileSize,
-                    Left = j * tileSize,
-                    Top = i * tileSize + offset,
-                    Text = tiles[i, j].Number.ToString(),
-                    Font = _tileFont
-                };
+                Width = tileSize,
+                Height = tileSize,
+                Left = j * tileSize,
+                Top = i * tileSize + offset,
+                Text = tiles[i, j].Number.ToString(),
+                Font = new Font("Comfortaa", (int)(60.0 / boardSize), FontStyle.Bold)
+            };
 
-                var row = i;
-                var col = j;
-                _buttons[i, j].Click += (s, e) => OnButtonClick(row, col);
-                
-                Controls.Add(_buttons[i, j]);
-            }
+            var (row, col) = (i, j);
+            _buttons[i, j].Click += (_, _) => OnButtonClick(row, col);
 
+            Controls.Add(_buttons[i, j]);
+        }
     }
 
-    public void UpdateView(int board_size, Tile[,] tiles, Color tile_color)
+    public void UpdateView(int boardSize, Tile[,] tiles, Color tileColor)
     {
         Controls.Clear();
-        for (var i = 0; i < board_size; i++)
-            for (var j = 0; j < board_size; j++)
+        for (var i = 0; i < boardSize; i++)
+        for (var j = 0; j < boardSize; j++)
+        {
+            _buttons[i, j].Text = tiles[i, j].Number.ToString();
+            _buttons[i, j].BackColor = Color.FromArgb(CountTileAlpha(boardSize, tiles, i, j), tileColor);
+            _buttons[i, j].Enabled = true;
+
+            if (tiles[i, j].IsEmpty)
             {
-                _buttons[i, j].Text = tiles[i, j].Number.ToString();
-                _buttons[i, j].BackColor = Color.FromArgb(CountTileAlpha(board_size, tiles, i, j), tile_color);
-                _buttons[i, j].Enabled = true;
-
-                if (tiles[i, j].IsEmpty)
-                {
-                    _buttons[i, j].Text = "";
-                    _buttons[i, j].BackColor = Color.White;
-                    _buttons[i, j].Enabled = false;
-                }
-
-                Controls.Add(_buttons[i, j]);
+                _buttons[i, j].Text = "";
+                _buttons[i, j].BackColor = Color.White;
+                _buttons[i, j].Enabled = false;
             }
+
+            Controls.Add(_buttons[i, j]);
+        }
 
         Controls.Add(_countTypeLabel);
         Controls.Add(_countLabel);
@@ -104,20 +96,16 @@ public class MainForm : Form
 
     private void OnButtonClick(int row, int col)
     {
-        EventHandler<CustomEventArgs> handler = BtnClickEvent;
-        if (handler != null)
-        {
-            handler(this, new CustomEventArgs(row, col));
-        }
+        var handler = BtnClickEvent;
+        handler(this, new CustomEventArgs(row, col));
     }
 
-    private int CountTileAlpha(int board_size, Tile[,] tiles, int row, int col)
+    private static int CountTileAlpha(int boardSize, Tile[,] tiles, int row, int col)
     {
         const int offset = 20;
         const double multiplier = 150;
-        var size = board_size;
 
-        return (int)(tiles[row, col].Number * multiplier / (size * size) + offset);
+        return (int)(tiles[row, col].Number * multiplier / (boardSize * boardSize) + offset);
     }
 
     public void SetCountType(string countType)
@@ -145,14 +133,8 @@ public class MainForm : Form
     }
 }
 
-public class CustomEventArgs : EventArgs
+public class CustomEventArgs(int row, int col) : EventArgs
 {
-    public CustomEventArgs(int row, int col)
-    {
-        Row = row;
-        Col = col;
-    }
-
-    public int Row { get; }
-    public int Col { get; }
+    public int Row { get; } = row;
+    public int Col { get; } = col;
 }

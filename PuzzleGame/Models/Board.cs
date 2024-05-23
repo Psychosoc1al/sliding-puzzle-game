@@ -40,7 +40,7 @@ public class Board : IObservable
     {
         _observers.Add(observer);
     }
-    
+
     public void ClearObservers()
     {
         _observers.Clear();
@@ -62,11 +62,10 @@ public class Board : IObservable
         NotifyObservers();
         EmptyTile = (row, col);
 
-        if (CheckWin())
-        {
-            Status = Status.Win;
-            NotifyWinObservers();
-        }
+        if (!CheckWin()) return (emptyRow, emptyCol);
+        Status = Status.Win;
+        NotifyWinObservers();
+
         return (emptyRow, emptyCol);
     }
 

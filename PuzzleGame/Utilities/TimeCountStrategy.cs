@@ -19,7 +19,7 @@ public class TimeCountStrategy(Board boardObservable, MainForm mainForm) : IWinO
     {
         mainForm.SetCount("0.0 c");
         mainForm.SetCountType("Время:");
-        
+
         boardObservable.RegisterObserver(this);
         boardObservable.RegisterWinObserver(this);
 

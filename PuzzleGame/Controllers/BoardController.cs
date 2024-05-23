@@ -1,15 +1,14 @@
 using PuzzleGame.Models;
 using PuzzleGame.Utilities;
 using PuzzleGame.Views;
-using System.Windows.Forms;
 
 namespace PuzzleGame.Controllers;
 
-public class BoardController: IObserver, IWinObserver
+public class BoardController : IObserver, IWinObserver
 {
-    private Board _board;
-    private MainForm _view;
-    public Color TileColor { get; }
+    private readonly Board _board;
+    private readonly MainForm _view;
+    private Color TileColor { get; }
     private readonly Stack<ICommand> _commands;
 
     public BoardController(MainForm view, Board board)
@@ -30,7 +29,7 @@ public class BoardController: IObserver, IWinObserver
         CreateButtons();
     }
 
-    public void CreateButtons()
+    private void CreateButtons()
     {
         _view.CreateButtons(_board.Size, _board.Tiles);
         _view.BtnClickEvent += MoveTile;
@@ -38,7 +37,7 @@ public class BoardController: IObserver, IWinObserver
     }
 
 
-    public void MoveTile(object? sender, CustomEventArgs e)
+    private void MoveTile(object? sender, CustomEventArgs e)
     {
         _board.Status = Status.Move;
         var command = new MoveTileCommand(_board, e.Row, e.Col);
@@ -46,7 +45,7 @@ public class BoardController: IObserver, IWinObserver
         _commands.Push(command);
     }
 
-    public void UndoMove(object? sender, EventArgs e)
+    private void UndoMove(object? sender, EventArgs e)
     {
         _board.Status = Status.UndoMove;
         if (_commands.Count <= 0) return;
@@ -54,7 +53,7 @@ public class BoardController: IObserver, IWinObserver
         command.Undo();
     }
 
-    public new void Update()
+    public void Update()
     {
         _view.UpdateView(_board.Size, _board.Tiles, TileColor);
     }
@@ -62,8 +61,8 @@ public class BoardController: IObserver, IWinObserver
     public void OnWin()
     {
         MessageBox.Show(
-            "Ïîçäðàâëÿåì! Âû âûèãðàëè!\nÕîòèòå íà÷àòü çàíîâî?",
-            "Ïîáåäà!",
+            "ÐŸÐ¾Ð·Ð´Ñ€Ð°Ð²Ð»ÑÐµÐ¼! Ð’Ñ‹ Ð²Ñ‹Ð¸Ð³Ñ€Ð°Ð»Ð¸!\nÐ¥Ð¾Ñ‚Ð¸Ñ‚Ðµ Ð½Ð°Ñ‡Ð°Ñ‚ÑŒ Ð·Ð°Ð½Ð¾Ð²Ð¾?",
+            "ÐŸÐ¾Ð±ÐµÐ´Ð°!",
             MessageBoxButtons.OK,
             MessageBoxIcon.Information
         );
