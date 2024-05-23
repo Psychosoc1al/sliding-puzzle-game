@@ -47,6 +47,8 @@ public class GameManager
 
             SetStrategy(_dialog.IsTimeGame, _board, _mainForm!);
             Strategy?.Execute();
+
+            _dialog.DialogResult = DialogResult.Abort;
             
             _mainForm?.Show();
         }

@@ -61,12 +61,13 @@ public class BoardController: IObserver, IWinObserver
 
     public void OnWin()
     {
-        MessageBox.Show(
+        DialogResult result = MessageBox.Show(
             "Поздравляем! Вы выиграли!\nХотите начать заново?",
             "Победа!",
-            MessageBoxButtons.OK,
+            MessageBoxButtons.YesNo,
             MessageBoxIcon.Information
         );
-        _view.Close();
+        if (result == DialogResult.Yes) _view.Close();
+        else Application.Exit();
     }
 }
