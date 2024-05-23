@@ -9,6 +9,8 @@ public class GameManager
 {
     private static readonly Lazy<GameManager> Instance = new(() => new GameManager());
     private StartGameDialog? _dialog;
+    private MainForm? _mainForm;
+    private Board? _board;
     public IStrategy? Strategy { get; private set; }
 
     public static GameManager GameInstance => Instance.Value;
@@ -18,7 +20,10 @@ public class GameManager
     public void Launch()
     {
         _dialog = new StartGameDialog();
-        StartGame();
+        _mainForm = new MainForm();
+        _dialog.FormClosing += StartGameDialog_FormClosing;
+        _mainForm.FormClosing += MainForm_OnClosing;
+        Application.Run(_dialog);
     }
 
     public void SetStrategy(bool isTimeGame, Board board, MainForm mainForm)
@@ -28,29 +33,45 @@ public class GameManager
             : new StepsCountStrategy(board, mainForm);
     }
     
-    private void StartGame()
+    private void StartGameDialog_FormClosing(object? sender, FormClosingEventArgs e)
     {
-        if (_dialog == null) return;
-        _dialog.DialogResult = DialogResult.Abort;
-        if (_dialog.ShowDialog() != DialogResult.OK) return;
-        
-        // _dialog.Hide();
-
-        var size = _dialog.BoardSize;
-        var mainForm = new MainForm();
-        var board = new Board(size);
-        mainForm.FormClosed += (_, _) => OnClose(board);
-        var newController = new BoardController(mainForm, board);
-        mainForm.SetController(newController);
-        SetStrategy(_dialog.IsTimeGame, board, mainForm);
-        Strategy?.Execute();
-        
-        Application.Run(mainForm);
-        StartGame();
+        if (((StartGameDialog)sender!).DialogResult == DialogResult.OK)
+        {
+            e.Cancel = true;
+            _dialog?.Hide();
+            
+            var size = _dialog!.BoardSize;
+            _board = new Board(size);
+            var newController = new BoardController(_mainForm!, _board);
+            _mainForm?.SetController(newController);
+            SetStrategy(_dialog.IsTimeGame, _board, _mainForm!);
+            Strategy?.Execute();
+            
+            _mainForm?.Show();
+        }
+        else
+        {
+            _dialog?.Dispose();
+            _mainForm?.Dispose();
+            Application.Exit();
+        }
     }
     
-    private void OnClose(Board board)
+    private void MainForm_OnClosing(object? sender, FormClosingEventArgs e)
     {
-        if (board.Status != Status.Win) Application.Exit();
+        if (_board?.Status == Status.Win)
+        {
+            e.Cancel = true;
+            _mainForm?.Hide();
+            _dialog!.DialogResult = DialogResult.Abort;
+            _dialog?.Show();
+        }
+        else
+        {
+            _mainForm?.Dispose();
+            _dialog?.Dispose();
+            Application.Exit();
+        }
+            
     }
 }

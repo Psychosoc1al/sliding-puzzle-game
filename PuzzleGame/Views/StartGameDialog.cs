@@ -101,5 +101,6 @@ public class StartGameDialog : Form
         };
         IsTimeGame = _gameTypeTimeRadioButton.Checked;
         DialogResult = DialogResult.OK;
+        Close();
     }
 }
