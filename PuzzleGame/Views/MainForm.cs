@@ -74,6 +74,7 @@ public class MainForm : Form
     public void UpdateView(int boardSize, Tile[,] tiles, Color tileColor)
     {
         Controls.Clear();
+
         for (var i = 0; i < boardSize; i++)
         for (var j = 0; j < boardSize; j++)
         {
