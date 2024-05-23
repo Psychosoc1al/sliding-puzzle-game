@@ -41,11 +41,6 @@ public class Board : IObservable
         _observers.Add(observer);
     }
 
-    public void ClearObservers()
-    {
-        _observers.Clear();
-    }
-
     public void NotifyObservers()
     {
         foreach (var observer in _observers) observer.Update();
@@ -92,6 +87,8 @@ public class Board : IObservable
     private void NotifyWinObservers()
     {
         foreach (var winObserver in _winObservers) winObserver.OnWin();
+
         _winObservers.Clear();
+        _observers.Clear();
     }
 }

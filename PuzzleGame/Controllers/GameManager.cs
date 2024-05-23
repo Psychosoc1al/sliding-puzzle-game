@@ -59,15 +59,14 @@ public class GameManager
         {
             e.Cancel = true;
             _mainForm.Hide();
-            _board.ClearObservers();
             _dialog.DialogResult = DialogResult.Abort;
             _dialog.Show();
+
+            return;
         }
-        else
-        {
-            _mainForm.Dispose();
-            _dialog.Dispose();
-            Application.Exit();
-        }
+
+        _mainForm.Dispose();
+        _dialog.Dispose();
+        Application.Exit();
     }
 }
