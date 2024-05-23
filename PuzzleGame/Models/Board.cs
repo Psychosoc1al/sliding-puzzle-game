@@ -40,6 +40,11 @@ public class Board : IObservable
     {
         _observers.Add(observer);
     }
+    
+    public void ClearObservers()
+    {
+        _observers.Clear();
+    }
 
     public void NotifyObservers()
     {

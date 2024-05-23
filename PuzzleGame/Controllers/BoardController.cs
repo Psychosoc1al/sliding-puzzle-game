@@ -10,13 +10,14 @@ public class BoardController: IObserver, IWinObserver
     private Board _board;
     private MainForm _view;
     public Color TileColor { get; }
-    private readonly Stack<ICommand> _commands = new();
+    private readonly Stack<ICommand> _commands;
 
     public BoardController(MainForm view, Board board)
     {
         _board = board;
         _view = view;
         _board.Status = Status.StartGame;
+        _commands = new Stack<ICommand>();
         TileColor = board.Size switch
         {
             3 => Color.SpringGreen,

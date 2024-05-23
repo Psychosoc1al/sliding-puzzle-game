@@ -11,6 +11,7 @@ public class GameManager
     private StartGameDialog? _dialog;
     private MainForm? _mainForm;
     private Board? _board;
+    private BoardController? _controller;
     public IStrategy? Strategy { get; private set; }
 
     public static GameManager GameInstance => Instance.Value;
@@ -42,7 +43,7 @@ public class GameManager
             
             var size = _dialog!.BoardSize;
             _board = new Board(size);
-            var newController = new BoardController(_mainForm!, _board);
+            _controller = new BoardController(_mainForm!, _board);
 
             SetStrategy(_dialog.IsTimeGame, _board, _mainForm!);
             Strategy?.Execute();
@@ -63,6 +64,7 @@ public class GameManager
         {
             e.Cancel = true;
             _mainForm?.Hide();
+            _board.ClearObservers();
             _dialog!.DialogResult = DialogResult.Abort;
             _dialog?.Show();
         }
