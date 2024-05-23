@@ -9,37 +9,39 @@ public class BoardController : IObserver, IWinObserver
     private readonly Board _board;
     private readonly MainForm _view;
     private Color TileColor { get; }
-    private readonly Stack<ICommand> _commands;
+    private readonly Stack<ICommand> _commands = new();
 
     public BoardController(MainForm view, Board board)
     {
         _board = board;
-        _view = view;
         _board.Status = Status.StartGame;
-        _commands = new Stack<ICommand>();
+        _board.RegisterObserver(this);
+        _board.RegisterWinObserver(this);
+
         TileColor = board.Size switch
         {
             3 => Color.SpringGreen,
             4 => Color.DarkOrange,
             _ => Color.Tomato
         };
+
+        _view = view;
         _view.CtrlZEvent += UndoMove;
-        _board.RegisterObserver(this);
-        _board.RegisterWinObserver(this);
+
         CreateButtons();
     }
 
     private void CreateButtons()
     {
-        _view.CreateButtons(_board.Size, _board.Tiles);
         _view.BtnClickEvent += MoveTile;
+        _view.CreateButtons(_board.Size, _board.Tiles);
         _view.UpdateView(_board.Size, _board.Tiles, TileColor);
     }
 
-
-    private void MoveTile(object? sender, CustomEventArgs e)
+    private void MoveTile(object? sender, MoveEventArgs e)
     {
         _board.Status = Status.Move;
+
         var command = new MoveTileCommand(_board, e.Row, e.Col);
         command.Execute();
         _commands.Push(command);
@@ -48,6 +50,7 @@ public class BoardController : IObserver, IWinObserver
     private void UndoMove(object? sender, EventArgs e)
     {
         _board.Status = Status.UndoMove;
+
         if (_commands.Count <= 0) return;
         var command = _commands.Pop();
         command.Undo();
@@ -66,6 +69,9 @@ public class BoardController : IObserver, IWinObserver
             MessageBoxButtons.OK,
             MessageBoxIcon.Information
         );
+
+        _view.CtrlZEvent -= UndoMove;
+        _view.BtnClickEvent -= MoveTile;
         _view.Close();
     }
 }

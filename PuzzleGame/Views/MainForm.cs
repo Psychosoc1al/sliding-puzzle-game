@@ -9,11 +9,10 @@ public class MainForm : Form
     private Button[,] _buttons = new Button[0, 0];
 
     public event EventHandler CtrlZEvent = delegate { };
-    public event EventHandler<CustomEventArgs> BtnClickEvent = delegate { };
+    public event EventHandler<MoveEventArgs> BtnClickEvent = delegate { };
 
     public MainForm()
     {
-        InitializeComponent();
         _countTypeLabel = new Label
         {
             Name = "textField",
@@ -42,6 +41,8 @@ public class MainForm : Form
             if (e is { Modifiers: Keys.Control, KeyCode: Keys.Z })
                 CtrlZEvent.Invoke(this, EventArgs.Empty);
         };
+
+        InitializeComponent();
     }
 
     public void CreateButtons(int boardSize, Tile[,] tiles)
@@ -64,7 +65,7 @@ public class MainForm : Form
             };
 
             var (row, col) = (i, j);
-            _buttons[i, j].Click += (_, _) => OnButtonClick(row, col);
+            _buttons[i, j].Click += (_, _) => BtnClickEvent(this, new MoveEventArgs(row, col));
 
             Controls.Add(_buttons[i, j]);
         }
@@ -94,12 +95,6 @@ public class MainForm : Form
         Controls.Add(_countLabel);
     }
 
-    private void OnButtonClick(int row, int col)
-    {
-        var handler = BtnClickEvent;
-        handler(this, new CustomEventArgs(row, col));
-    }
-
     private static int CountTileAlpha(int boardSize, Tile[,] tiles, int row, int col)
     {
         const int offset = 20;
@@ -120,8 +115,6 @@ public class MainForm : Form
 
     private void InitializeComponent()
     {
-        SuspendLayout();
-
         MinimumSize = new Size(500, 583);
         FormBorderStyle = FormBorderStyle.FixedDialog;
         Name = "MainForm";
@@ -129,11 +122,10 @@ public class MainForm : Form
         DoubleBuffered = true;
         MaximizeBox = false;
         StartPosition = FormStartPosition.CenterScreen;
-        ResumeLayout(false);
     }
 }
 
-public class CustomEventArgs(int row, int col) : EventArgs
+public class MoveEventArgs(int row, int col) : EventArgs
 {
     public int Row { get; } = row;
     public int Col { get; } = col;
