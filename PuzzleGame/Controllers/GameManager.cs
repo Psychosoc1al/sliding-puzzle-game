@@ -43,8 +43,7 @@ public class GameManager
             var size = _dialog!.BoardSize;
             _board = new Board(size);
             var newController = new BoardController(_mainForm!, _board);
-            //newController.CreateButtons();
-            //_mainForm?.SetController(newController);
+
             SetStrategy(_dialog.IsTimeGame, _board, _mainForm!);
             Strategy?.Execute();
             

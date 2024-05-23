@@ -6,7 +6,6 @@ namespace PuzzleGame.Views;
 
 public class MainForm : Form
 {
-    //private BoardController? _controller;
     private readonly Label _countTypeLabel;
     private readonly Label _countLabel;
     private Font? _tileFont;
@@ -77,7 +76,6 @@ public class MainForm : Form
                 Controls.Add(_buttons[i, j]);
             }
 
-        //UpdateView();
     }
 
     public void UpdateView(int board_size, Tile[,] tiles, Color tile_color)
@@ -131,29 +129,6 @@ public class MainForm : Form
     {
         _countLabel.Text = count;
     }
-
-    //public new void Update()
-    //{
-    //    UpdateView();
-    //}
-
-    //public void OnWin()
-    //{
-    //    if (_controller == null) return;
-    //    MessageBox.Show(
-    //        "Поздравляем! Вы выиграли!\nХотите начать заново?",
-    //        "Победа!",
-    //        MessageBoxButtons.OK,
-    //        MessageBoxIcon.Information
-    //    );
-    //    Close();
-    //}
-
-    //private void CtrlZ(object? sender, KeyEventArgs e)
-    //{
-    //    if (e is { Modifiers: Keys.Control, KeyCode: Keys.Z })
-    //        _controller?.UndoMove();
-    //}
 
     private void InitializeComponent()
     {
