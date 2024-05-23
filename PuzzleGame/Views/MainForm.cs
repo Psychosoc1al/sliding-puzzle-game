@@ -4,13 +4,16 @@ using PuzzleGame.Utilities;
 
 namespace PuzzleGame.Views;
 
-public class MainForm : Form, IObserver, IWinObserver
+public class MainForm : Form
 {
-    private BoardController? _controller;
+    //private BoardController? _controller;
     private readonly Label _countTypeLabel;
     private readonly Label _countLabel;
     private Font? _tileFont;
     private Button[,]? _buttons;
+
+    public event EventHandler CtrlZEvent;
+    public event EventHandler<CustomEventArgs> BtnClickEvent;
 
     public MainForm()
     {
@@ -38,77 +41,85 @@ public class MainForm : Form, IObserver, IWinObserver
         };
 
         KeyPreview = true;
-        KeyDown += CtrlZ;
+        KeyDown += (s, e) =>
+        {
+            if (e is { Modifiers: Keys.Control, KeyCode: Keys.Z })
+                CtrlZEvent?.Invoke(this, EventArgs.Empty);
+        };
+
+
     }
 
-    public void SetController(BoardController? controller)
+    public void CreateButtons(int board_size, Tile[,] tiles)
     {
-        _controller = controller;
-        _controller?.Board.RegisterObserver(this);
-        _controller?.Board.RegisterWinObserver(this);
-
-
         const int offset = 50;
-        var tileSize = ClientSize.Width / _controller!.Board.Size;
-        _tileFont ??= new Font("Comfortaa", (int)(60.0 / _controller.Board.Size)!, FontStyle.Bold);
-        var size = _controller!.Board.Size;
+        var tileSize = ClientSize.Width / board_size;
+        _tileFont ??= new Font("Comfortaa", (int)(60.0 / board_size)!, FontStyle.Bold);
+        var size = board_size;
         _buttons = new Button[size, size];
         for (var i = 0; i < size; i++)
-        for (var j = 0; j < size; j++)
-        {
-            _buttons[i, j] = new Button
+            for (var j = 0; j < size; j++)
             {
-                Width = tileSize,
-                Height = tileSize,
-                Left = j * tileSize,
-                Top = i * tileSize + offset,
-                Text = _controller.Board.Tiles[i, j].Number.ToString(),
-                Font = _tileFont
-            };
+                _buttons[i, j] = new Button
+                {
+                    Width = tileSize,
+                    Height = tileSize,
+                    Left = j * tileSize,
+                    Top = i * tileSize + offset,
+                    Text = tiles[i, j].Number.ToString(),
+                    Font = _tileFont
+                };
 
-            var row = i;
-            var col = j;
-            _buttons[i, j].Click += (_, _) => _controller.MoveTile(row, col);
-
-            Controls.Add(_buttons[i, j]);
-        }
-
-        UpdateView();
-    }
-
-    private void UpdateView()
-    {
-        Controls.Clear();
-        if (_controller == null) return;
-        for (var i = 0; i < _controller.Board.Size; i++)
-        for (var j = 0; j < _controller.Board.Size; j++)
-        {
-            _buttons[i, j].Text = _controller.Board.Tiles[i, j].Number.ToString();
-            _buttons[i, j].BackColor = Color.FromArgb(CountTileAlpha(i, j), _controller.TileColor);
-            _buttons[i, j].Enabled = true;
-
-            if (_controller.Board.Tiles[i, j].IsEmpty)
-            {
-                _buttons[i, j].Text = "";
-                _buttons[i, j].BackColor = Color.White;
-                _buttons[i, j].Enabled = false;
+                var row = i;
+                var col = j;
+                _buttons[i, j].Click += (s, e) => OnButtonClick(row, col);
+                
+                Controls.Add(_buttons[i, j]);
             }
 
-            Controls.Add(_buttons[i, j]);
-        }
+        //UpdateView();
+    }
+
+    public void UpdateView(int board_size, Tile[,] tiles, Color tile_color)
+    {
+        Controls.Clear();
+        for (var i = 0; i < board_size; i++)
+            for (var j = 0; j < board_size; j++)
+            {
+                _buttons[i, j].Text = tiles[i, j].Number.ToString();
+                _buttons[i, j].BackColor = Color.FromArgb(CountTileAlpha(board_size, tiles, i, j), tile_color);
+                _buttons[i, j].Enabled = true;
+
+                if (tiles[i, j].IsEmpty)
+                {
+                    _buttons[i, j].Text = "";
+                    _buttons[i, j].BackColor = Color.White;
+                    _buttons[i, j].Enabled = false;
+                }
+
+                Controls.Add(_buttons[i, j]);
+            }
 
         Controls.Add(_countTypeLabel);
         Controls.Add(_countLabel);
     }
 
-    private int CountTileAlpha(int row, int col)
+    private void OnButtonClick(int row, int col)
     {
-        if (_controller == null) return 0;
+        EventHandler<CustomEventArgs> handler = BtnClickEvent;
+        if (handler != null)
+        {
+            handler(this, new CustomEventArgs(row, col));
+        }
+    }
+
+    private int CountTileAlpha(int board_size, Tile[,] tiles, int row, int col)
+    {
         const int offset = 20;
         const double multiplier = 150;
-        var size = _controller.Board.Size;
+        var size = board_size;
 
-        return (int)(_controller.Board.Tiles[row, col].Number * multiplier / (size * size) + offset);
+        return (int)(tiles[row, col].Number * multiplier / (size * size) + offset);
     }
 
     public void SetCountType(string countType)
@@ -121,28 +132,28 @@ public class MainForm : Form, IObserver, IWinObserver
         _countLabel.Text = count;
     }
 
-    public new void Update()
-    {
-        UpdateView();
-    }
+    //public new void Update()
+    //{
+    //    UpdateView();
+    //}
 
-    public void OnWin()
-    {
-        if (_controller == null) return;
-        MessageBox.Show(
-            "Поздравляем! Вы выиграли!\nХотите начать заново?",
-            "Победа!",
-            MessageBoxButtons.OK,
-            MessageBoxIcon.Information
-        );
-        Close();
-    }
+    //public void OnWin()
+    //{
+    //    if (_controller == null) return;
+    //    MessageBox.Show(
+    //        "Поздравляем! Вы выиграли!\nХотите начать заново?",
+    //        "Победа!",
+    //        MessageBoxButtons.OK,
+    //        MessageBoxIcon.Information
+    //    );
+    //    Close();
+    //}
 
-    private void CtrlZ(object? sender, KeyEventArgs e)
-    {
-        if (e is { Modifiers: Keys.Control, KeyCode: Keys.Z })
-            _controller?.UndoMove();
-    }
+    //private void CtrlZ(object? sender, KeyEventArgs e)
+    //{
+    //    if (e is { Modifiers: Keys.Control, KeyCode: Keys.Z })
+    //        _controller?.UndoMove();
+    //}
 
     private void InitializeComponent()
     {
@@ -157,4 +168,16 @@ public class MainForm : Form, IObserver, IWinObserver
         StartPosition = FormStartPosition.CenterScreen;
         ResumeLayout(false);
     }
+}
+
+public class CustomEventArgs : EventArgs
+{
+    public CustomEventArgs(int row, int col)
+    {
+        Row = row;
+        Col = col;
+    }
+
+    public int Row { get; }
+    public int Col { get; }
 }
