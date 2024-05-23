@@ -24,6 +24,8 @@ public class BoardController: IObserver, IWinObserver
             _ => Color.Tomato
         };
         _view.CtrlZEvent += UndoMove;
+        _board.RegisterObserver(this);
+        _board.RegisterWinObserver(this);
         CreateButtons();
     }
 
@@ -31,6 +33,7 @@ public class BoardController: IObserver, IWinObserver
     {
         _view.CreateButtons(_board.Size, _board.Tiles);
         _view.BtnClickEvent += MoveTile;
+        _view.UpdateView(_board.Size, _board.Tiles, TileColor);
     }
 
 
