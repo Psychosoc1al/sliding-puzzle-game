@@ -17,7 +17,6 @@ public class TimeCountStrategy(Board boardObservable, MainForm mainForm) : IWinO
 
     public void Execute()
     {
-        boardObservable.RegisterWinObserver(this);
         mainForm.SetCount("0.0 c");
         mainForm.SetCountType("Время:");
         
@@ -30,11 +29,10 @@ public class TimeCountStrategy(Board boardObservable, MainForm mainForm) : IWinO
 
     public void Update()
     {
-        if (!_timer.Enabled)
-        {
-            _timer.Start();
-            _elapsedTimeDecimals = 0;
-        }
+        if (_timer.Enabled) return;
+
+        _timer.Start();
+        _elapsedTimeDecimals = 0;
     }
 
     public void OnWin()
