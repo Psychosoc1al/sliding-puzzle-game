@@ -19,6 +19,7 @@ public class StartGameDialog : Form
         _startButton = new Button();
         _flowLayoutPanel = new FlowLayoutPanel();
         _rowLayoutPanel = new FlowLayoutPanel();
+
         InitializeComponent();
     }
 
@@ -101,6 +102,7 @@ public class StartGameDialog : Form
         };
         IsTimeGame = _gameTypeTimeRadioButton.Checked;
         DialogResult = DialogResult.OK;
+
         Close();
     }
 }
