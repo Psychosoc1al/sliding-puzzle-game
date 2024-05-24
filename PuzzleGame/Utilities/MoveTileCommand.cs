@@ -9,9 +9,11 @@ public class MoveTileCommand(Board board, int row, int col) : ICommand
     private int _rowOld = row;
     private int _colOld = col;
 
-    public void Execute()
+    public bool Execute()
     {
         (_rowOld, _colOld) = board.MoveTile(_row, _col);
+
+        return (_rowOld, _colOld) != (-1, -1);
     }
 
     public void Undo()

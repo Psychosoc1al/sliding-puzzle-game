@@ -1,8 +1,9 @@
 namespace PuzzleGame.Utilities;
 
-public enum StatusEnum
+public enum Status
 {
     StartGame,
     Move,
-    UndoMove
+    UndoMove,
+    Win
 }
