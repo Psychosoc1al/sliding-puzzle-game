@@ -43,8 +43,8 @@ public class BoardController : IObserver, IWinObserver
         _board.Status = Status.Move;
 
         var command = new MoveTileCommand(_board, e.Row, e.Col);
-        command.Execute();
-        _commands.Push(command);
+        if (command.Execute())
+            _commands.Push(command);
     }
 
     private void UndoMove(object? sender, EventArgs e)
@@ -63,7 +63,7 @@ public class BoardController : IObserver, IWinObserver
 
     public void OnWin()
     {
-        DialogResult result = MessageBox.Show(
+        var result = MessageBox.Show(
             "Поздравляем! Вы выиграли!\nХотите начать заново?",
             "Победа!",
             MessageBoxButtons.YesNo,
