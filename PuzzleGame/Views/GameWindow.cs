@@ -30,8 +30,9 @@ public class GameWindow : Form
             Text = "0",
             TextAlign = ContentAlignment.TopRight,
             Top = 0,
-            Left = 270,
+            Left = 220,
             Height = 100,
+            Width = 150,
             Font = new Font("Comfortaa", 15, FontStyle.Bold)
         };
 
@@ -48,7 +49,8 @@ public class GameWindow : Form
     public void CreateButtons(int boardSize, Tile[,] tiles)
     {
         const int offset = 50;
-        var tileSize = ClientSize.Width / boardSize;
+        var buttonSize = ClientSize.Width / boardSize;
+        var buttonFont = new Font("Comfortaa", (int)(60.0 / boardSize), FontStyle.Bold);
         _buttons = new Button[boardSize, boardSize];
 
         for (var i = 0; i < boardSize; i++)
@@ -56,12 +58,12 @@ public class GameWindow : Form
         {
             _buttons[i, j] = new Button
             {
-                Width = tileSize,
-                Height = tileSize,
-                Left = j * tileSize,
-                Top = i * tileSize + offset,
+                Width = buttonSize,
+                Height = buttonSize,
+                Left = j * buttonSize,
+                Top = i * buttonSize + offset,
                 Text = tiles[i, j].Number.ToString(),
-                Font = new Font("Comfortaa", (int)(60.0 / boardSize), FontStyle.Bold)
+                Font = buttonFont
             };
 
             var (row, col) = (i, j);
