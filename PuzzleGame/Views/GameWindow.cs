@@ -2,7 +2,7 @@ using PuzzleGame.Models;
 
 namespace PuzzleGame.Views;
 
-public class MainForm : Form
+public class GameWindow : Form
 {
     private readonly Label _countTypeLabel;
     private readonly Label _countLabel;
@@ -11,7 +11,7 @@ public class MainForm : Form
     public event EventHandler CtrlZEvent = delegate { };
     public event EventHandler<MoveEventArgs> BtnClickEvent = delegate { };
 
-    public MainForm()
+    public GameWindow()
     {
         _countTypeLabel = new Label
         {
@@ -118,7 +118,7 @@ public class MainForm : Form
     {
         MinimumSize = new Size(500, 583);
         FormBorderStyle = FormBorderStyle.FixedDialog;
-        Name = "MainForm";
+        Name = "GameWindow";
         Text = "Пятнашки";
         DoubleBuffered = true;
         MaximizeBox = false;

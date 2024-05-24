@@ -1,6 +1,6 @@
-using PuzzleGame.Models;
+using PuzzleGame.Utilities;
 
-namespace PuzzleGame.Utilities;
+namespace PuzzleGame.Models;
 
 public class MoveTileCommand(Board board, int row, int col) : ICommand
 {

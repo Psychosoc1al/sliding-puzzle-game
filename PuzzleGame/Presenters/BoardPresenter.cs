@@ -2,16 +2,16 @@ using PuzzleGame.Models;
 using PuzzleGame.Utilities;
 using PuzzleGame.Views;
 
-namespace PuzzleGame.Controllers;
+namespace PuzzleGame.Presenters;
 
-public class BoardController : IObserver, IWinObserver
+public class BoardPresenter : IObserver, IWinObserver
 {
     private readonly Board _board;
-    private readonly MainForm _view;
+    private readonly GameWindow _view;
     private Color TileColor { get; }
     private readonly Stack<ICommand> _commands = new();
 
-    public BoardController(MainForm view, Board board)
+    public BoardPresenter(GameWindow view, Board board)
     {
         _board = board;
         _board.Status = Status.StartGame;
