@@ -72,7 +72,7 @@ public class BoardPresenter : IObserver, IWinObserver
 
         _view.CtrlZEvent -= UndoMove;
         _view.BtnClickEvent -= MoveTile;
-        if (result == DialogResult.Yes) _view.Close();
-        else Application.Exit();
+        if (result == DialogResult.No) _board.Status = Status.Move;
+        _view.Close();
     }
 }
