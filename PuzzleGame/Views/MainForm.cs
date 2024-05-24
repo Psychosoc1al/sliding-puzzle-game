@@ -1,20 +1,18 @@
-using PuzzleGame.Controllers;
 using PuzzleGame.Models;
-using PuzzleGame.Utilities;
 
 namespace PuzzleGame.Views;
 
-public class MainForm : Form, IObserver, IWinObserver
+public class MainForm : Form
 {
-    private BoardController? _controller;
     private readonly Label _countTypeLabel;
     private readonly Label _countLabel;
-    private Font? _tileFont;
-    private Button[,]? _buttons;
+    private Button[,] _buttons = new Button[0, 0];
+
+    public event EventHandler CtrlZEvent = delegate { };
+    public event EventHandler<MoveEventArgs> BtnClickEvent = delegate { };
 
     public MainForm()
     {
-        InitializeComponent();
         _countTypeLabel = new Label
         {
             Name = "textField",
@@ -38,22 +36,23 @@ public class MainForm : Form, IObserver, IWinObserver
         };
 
         KeyPreview = true;
-        KeyDown += CtrlZ;
+        KeyDown += (_, e) =>
+        {
+            if (e is { Modifiers: Keys.Control, KeyCode: Keys.Z })
+                CtrlZEvent.Invoke(this, EventArgs.Empty);
+        };
+
+        InitializeComponent();
     }
 
-    public void SetController(BoardController? controller)
+    public void CreateButtons(int boardSize, Tile[,] tiles)
     {
-        _controller = controller;
-        _controller?.Board.RegisterObserver(this);
-        _controller?.Board.RegisterWinObserver(this);
-
         const int offset = 50;
-        var tileSize = ClientSize.Width / _controller!.Board.Size;
-        _tileFont ??= new Font("Comfortaa", (int)(60.0 / _controller.Board.Size)!, FontStyle.Bold);
-        var size = _controller!.Board.Size;
-        _buttons = new Button[size, size];
-        for (var i = 0; i < size; i++)
-        for (var j = 0; j < size; j++)
+        var tileSize = ClientSize.Width / boardSize;
+        _buttons = new Button[boardSize, boardSize];
+
+        for (var i = 0; i < boardSize; i++)
+        for (var j = 0; j < boardSize; j++)
         {
             _buttons[i, j] = new Button
             {
@@ -61,33 +60,29 @@ public class MainForm : Form, IObserver, IWinObserver
                 Height = tileSize,
                 Left = j * tileSize,
                 Top = i * tileSize + offset,
-                Text = _controller.Board.Tiles[i, j].Number.ToString(),
-                Font = _tileFont
+                Text = tiles[i, j].Number.ToString(),
+                Font = new Font("Comfortaa", (int)(60.0 / boardSize), FontStyle.Bold)
             };
 
-            var row = i;
-            var col = j;
-            _buttons[i, j].Click += (_, _) => _controller.MoveTile(row, col);
+            var (row, col) = (i, j);
+            _buttons[i, j].Click += (_, _) => BtnClickEvent(this, new MoveEventArgs(row, col));
 
             Controls.Add(_buttons[i, j]);
         }
-
-        UpdateView();
     }
 
-    private void UpdateView()
+    public void UpdateView(int boardSize, Tile[,] tiles, Color tileColor)
     {
         Controls.Clear();
-        if (_controller == null) return;
-        for (var i = 0; i < _controller.Board.Size; i++)
-        for (var j = 0; j < _controller.Board.Size; j++)
+
+        for (var i = 0; i < boardSize; i++)
+        for (var j = 0; j < boardSize; j++)
         {
-            if (_buttons == null) continue;
-            _buttons[i, j].Text = _controller.Board.Tiles[i, j].Number.ToString();
-            _buttons[i, j].BackColor = Color.FromArgb(CountTileAlpha(i, j), _controller.TileColor);
+            _buttons[i, j].Text = tiles[i, j].Number.ToString();
+            _buttons[i, j].BackColor = Color.FromArgb(CountTileAlpha(boardSize, tiles, i, j), tileColor);
             _buttons[i, j].Enabled = true;
 
-            if (_controller.Board.Tiles[i, j].IsEmpty)
+            if (tiles[i, j].IsEmpty)
             {
                 _buttons[i, j].Text = "";
                 _buttons[i, j].BackColor = Color.White;
@@ -101,14 +96,12 @@ public class MainForm : Form, IObserver, IWinObserver
         Controls.Add(_countLabel);
     }
 
-    private int CountTileAlpha(int row, int col)
+    private static int CountTileAlpha(int boardSize, Tile[,] tiles, int row, int col)
     {
-        if (_controller == null) return 0;
         const int offset = 20;
         const double multiplier = 150;
-        var size = _controller.Board.Size;
 
-        return (int)(_controller.Board.Tiles[row, col].Number * multiplier / (size * size) + offset);
+        return (int)(tiles[row, col].Number * multiplier / (boardSize * boardSize) + offset);
     }
 
     public void SetCountType(string countType)
@@ -121,49 +114,8 @@ public class MainForm : Form, IObserver, IWinObserver
         _countLabel.Text = count;
     }
 
-    public new void Update()
-    {
-        UpdateView();
-    }
-
-    public void OnWin()
-    {
-        if (_controller == null) return;
-        MessageBox.Show(
-            "Поздравляем! Вы выиграли!\nХотите начать заново?",
-            "Победа!",
-            MessageBoxButtons.OK,
-            MessageBoxIcon.Information
-        );
-
-        RestartGame();
-    }
-
-    private void RestartGame()
-    {
-        Hide();
-        using var dialog = new StartGameDialog();
-        if (dialog.ShowDialog() != DialogResult.OK) Application.Exit();
-
-        var size = dialog.BoardSize;
-        var board = new Board(size);
-        GameManager.GameInstance.SetStrategy(dialog.IsTimeGame, board, this);
-        GameManager.GameInstance.Strategy?.Execute();
-        var newController = new BoardController(this, board);
-        SetController(newController);
-        Show();
-    }
-
-    private void CtrlZ(object? sender, KeyEventArgs e)
-    {
-        if (e is { Modifiers: Keys.Control, KeyCode: Keys.Z })
-            _controller?.UndoMove();
-    }
-
     private void InitializeComponent()
     {
-        SuspendLayout();
-
         MinimumSize = new Size(500, 583);
         FormBorderStyle = FormBorderStyle.FixedDialog;
         Name = "MainForm";
@@ -171,6 +123,11 @@ public class MainForm : Form, IObserver, IWinObserver
         DoubleBuffered = true;
         MaximizeBox = false;
         StartPosition = FormStartPosition.CenterScreen;
-        ResumeLayout(false);
     }
+}
+
+public class MoveEventArgs(int row, int col) : EventArgs
+{
+    public int Row { get; } = row;
+    public int Col { get; } = col;
 }

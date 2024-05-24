@@ -21,8 +21,9 @@ public class StepsCountStrategy(Board boardObservable, MainForm mainForm) : IObs
             case Status.UndoMove:
                 Count--;
                 break;
+            case Status.Win:
             default:
-                throw new ArgumentOutOfRangeException();
+                break;
         }
 
         mainForm.SetCount(Count.ToString());

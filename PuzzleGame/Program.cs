@@ -1,4 +1,4 @@
-using PuzzleGame.Utilities;
+using PuzzleGame.Controllers;
 
 namespace PuzzleGame;
 
@@ -10,6 +10,6 @@ internal static class Program
         Application.EnableVisualStyles();
         Application.SetCompatibleTextRenderingDefault(false);
 
-        GameManager.GameInstance.StartGame();
+        GameManager.GameInstance.Launch();
     }
 }
