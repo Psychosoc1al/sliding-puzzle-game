@@ -2,13 +2,13 @@ using PuzzleGame.Models;
 using PuzzleGame.Utilities;
 using PuzzleGame.Views;
 
-namespace PuzzleGame.Controllers;
+namespace PuzzleGame.Presenters;
 
 public class GameManager
 {
     private static readonly Lazy<GameManager> Instance = new(() => new GameManager());
     private readonly StartGameDialog _dialog = new();
-    private readonly MainForm _mainForm = new();
+    private readonly GameWindow _gameWindow = new();
     private Board _board = null!;
     private IStrategy Strategy { get; set; } = null!;
 
@@ -17,16 +17,16 @@ public class GameManager
     public void Launch()
     {
         _dialog.FormClosing += StartGameDialog_FormClosing;
-        _mainForm.FormClosing += MainForm_OnClosing;
+        _gameWindow.FormClosing += GameWindowOnClosing;
 
         Application.Run(_dialog);
     }
 
-    private void SetStrategy(bool isTimeGame, Board board, MainForm mainForm)
+    private void SetStrategy(bool isTimeGame, Board board, GameWindow gameWindow)
     {
         Strategy = isTimeGame
-            ? new TimeCountStrategy(board, mainForm)
-            : new StepsCountStrategy(board, mainForm);
+            ? new TimeCountStrategy(board, gameWindow)
+            : new StepsCountStrategy(board, gameWindow);
     }
 
     private void StartGameDialog_FormClosing(object? sender, FormClosingEventArgs e)
@@ -38,37 +38,36 @@ public class GameManager
 
             var size = _dialog.BoardSize;
             _board = new Board(size);
-            _ = new BoardController(_mainForm, _board);
+            _ = new BoardPresenter(_gameWindow, _board);
 
-            SetStrategy(_dialog.IsTimeGame, _board, _mainForm);
+            SetStrategy(_dialog.IsTimeGame, _board, _gameWindow);
             Strategy.Execute();
-            
+
             _dialog.DialogResult = DialogResult.Abort;
-            
-            _mainForm.Show();
+
+            _gameWindow.Show();
+            return;
         }
-        else
-        {
-            _dialog.Dispose();
-            _mainForm.Dispose();
-            Application.Exit();
-        }
+
+        _dialog.Dispose();
+        _gameWindow.Dispose();
+        Application.Exit();
     }
 
-    private void MainForm_OnClosing(object? sender, FormClosingEventArgs e)
+    private void GameWindowOnClosing(object? sender, FormClosingEventArgs e)
     {
         if (_board.Status == Status.Win)
         {
             e.Cancel = true;
-            _mainForm.Hide();
+            _gameWindow.Hide();
             _dialog.DialogResult = DialogResult.Abort;
             _dialog.Show();
 
             return;
         }
 
-        _mainForm.Dispose();
         _dialog.Dispose();
+        _gameWindow.Dispose();
         Application.Exit();
     }
 }

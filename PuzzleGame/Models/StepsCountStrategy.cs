@@ -1,9 +1,9 @@
-using PuzzleGame.Models;
+using PuzzleGame.Utilities;
 using PuzzleGame.Views;
 
-namespace PuzzleGame.Utilities;
+namespace PuzzleGame.Models;
 
-public class StepsCountStrategy(Board boardObservable, MainForm mainForm) : IObserver, IStrategy
+public class StepsCountStrategy(Board boardObservable, GameWindow gameWindow) : IObserver, IStrategy
 {
     private int Count { get; set; }
 
@@ -26,13 +26,13 @@ public class StepsCountStrategy(Board boardObservable, MainForm mainForm) : IObs
                 break;
         }
 
-        mainForm.SetCount(Count.ToString());
+        gameWindow.SetCount(Count.ToString());
     }
 
     public void Execute()
     {
         boardObservable.RegisterObserver(this);
-        mainForm.SetCount("0");
-        mainForm.SetCountType("Шаги:");
+        gameWindow.SetCount("0");
+        gameWindow.SetCountType("Шаги:");
     }
 }

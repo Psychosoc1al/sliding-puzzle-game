@@ -1,10 +1,10 @@
-using PuzzleGame.Models;
+using PuzzleGame.Utilities;
 using PuzzleGame.Views;
 using Timer = System.Windows.Forms.Timer;
 
-namespace PuzzleGame.Utilities;
+namespace PuzzleGame.Models;
 
-public class TimeCountStrategy(Board boardObservable, MainForm mainForm) : IWinObserver, IStrategy, IObserver
+public class TimeCountStrategy(Board boardObservable, GameWindow gameWindow) : IWinObserver, IStrategy, IObserver
 {
     private readonly Timer _timer = new();
     private int _elapsedTimeDecimals;
@@ -12,13 +12,13 @@ public class TimeCountStrategy(Board boardObservable, MainForm mainForm) : IWinO
     private void Timer_Tick(object? sender, EventArgs e)
     {
         _elapsedTimeDecimals++;
-        mainForm.SetCount($"{_elapsedTimeDecimals / 10.0:F1} c");
+        gameWindow.SetCount($"{_elapsedTimeDecimals / 10.0:F1} c");
     }
 
     public void Execute()
     {
-        mainForm.SetCount("0.0 c");
-        mainForm.SetCountType("Время:");
+        gameWindow.SetCount("0.0 c");
+        gameWindow.SetCountType("Время:");
 
         boardObservable.RegisterObserver(this);
         boardObservable.RegisterWinObserver(this);

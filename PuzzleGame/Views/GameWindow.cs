@@ -2,7 +2,7 @@ using PuzzleGame.Models;
 
 namespace PuzzleGame.Views;
 
-public class MainForm : Form
+public class GameWindow : Form
 {
     private readonly Label _countTypeLabel;
     private readonly Label _countLabel;
@@ -11,7 +11,7 @@ public class MainForm : Form
     public event EventHandler CtrlZEvent = delegate { };
     public event EventHandler<MoveEventArgs> BtnClickEvent = delegate { };
 
-    public MainForm()
+    public GameWindow()
     {
         _countTypeLabel = new Label
         {
@@ -30,8 +30,9 @@ public class MainForm : Form
             Text = "0",
             TextAlign = ContentAlignment.TopRight,
             Top = 0,
-            Left = 270,
+            Left = 220,
             Height = 100,
+            Width = 150,
             Font = new Font("Comfortaa", 15, FontStyle.Bold)
         };
 
@@ -48,7 +49,8 @@ public class MainForm : Form
     public void CreateButtons(int boardSize, Tile[,] tiles)
     {
         const int offset = 50;
-        var tileSize = ClientSize.Width / boardSize;
+        var buttonSize = ClientSize.Width / boardSize;
+        var buttonFont = new Font("Comfortaa", (int)(60.0 / boardSize), FontStyle.Bold);
         _buttons = new Button[boardSize, boardSize];
 
         for (var i = 0; i < boardSize; i++)
@@ -56,12 +58,12 @@ public class MainForm : Form
         {
             _buttons[i, j] = new Button
             {
-                Width = tileSize,
-                Height = tileSize,
-                Left = j * tileSize,
-                Top = i * tileSize + offset,
+                Width = buttonSize,
+                Height = buttonSize,
+                Left = j * buttonSize,
+                Top = i * buttonSize + offset,
                 Text = tiles[i, j].Number.ToString(),
-                Font = new Font("Comfortaa", (int)(60.0 / boardSize), FontStyle.Bold)
+                Font = buttonFont
             };
 
             var (row, col) = (i, j);
@@ -118,7 +120,7 @@ public class MainForm : Form
     {
         MinimumSize = new Size(500, 583);
         FormBorderStyle = FormBorderStyle.FixedDialog;
-        Name = "MainForm";
+        Name = "GameWindow";
         Text = "Пятнашки";
         DoubleBuffered = true;
         MaximizeBox = false;
